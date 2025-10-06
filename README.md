@@ -60,6 +60,33 @@ The following walk-through illustrates how data captured by several related lega
 
 When the application captures new data, it continues to populate these refactored tables even if the originating screen used to write into the old schema. For example, creating a new broker automatically creates an `entities` record and related `entity_contacts`, and linking that broker to a deal adds a row to `relationship_links` instead of `broker_agent_deals`. The migration scripts that accompany the schema perform the same transformations in bulk, guaranteeing that legacy records and new transactions share the same data model going forward.
 
+### Automating column-level migrations
+
+To accelerate ETL work, the repository now ships with `data_migration.py`, a Python helper that analyses the DDL snapshots and the curated table mapping to generate a deterministic migration plan. The script:
+
+- Parses `ddl.sql`, `refactored_ddl.sql`, and `refactored_ddl.sh` to align legacy tables with their refactored destinations.
+- Highlights columns that can be copied verbatim because the target table exposes the same column name.
+- Emits guidance for columns that require polymorphic joins or attribute assignments so bespoke loaders can focus on the nuanced cases.
+- Optionally executes the direct copies when pointed at live database connections via SQLAlchemy DSNs.
+
+Typical workflows:
+
+```bash
+# Inspect the migration plan in your terminal
+python data_migration.py --plan-only
+
+# Persist a JSON version of the plan for documentation or downstream tooling
+python data_migration.py --plan-output migration_plan.json
+
+# Execute the deterministic portion of the plan
+python data_migration.py \
+  --source-dsn postgresql+psycopg://user:pass@legacy-host/legacy_db \
+  --target-dsn postgresql+psycopg://user:pass@target-host/refactored_db \
+  --execute
+```
+
+Use the plan output as a checklist: the script only moves data for columns with an unambiguous destination, leaving relationship fan-out and attribute reshaping to domain-specific ETL jobs.
+
 ### Mapping flow script
 
 Run `./refactored_ddl.sh` to print an end-to-end mapping flow that walks each legacy table to its destination inside the refactored schema. The script mirrors the table above, but it also highlights when polymorphic join tables (`relationship_links`, `note_links`, etc.) absorb responsibilities that were previously handled by bespoke pivot tables. Because the mapping is generated programmatically, you can feed the output into documentation or migration tooling without reformatting by hand. See [`refactored_ddl_mapping.md`](refactored_ddl_mapping.md) for a narrative walkthrough of the script's output structure and usage tips.【F:refactored_ddl.sh†L1-L172】【F:refactored_ddl_mapping.md†L1-L46】
