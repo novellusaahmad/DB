@@ -38,7 +38,7 @@ Total legacy tables covered: **149**.
 
 ### Mapping flow script
 
-Run `./refactored_ddl.sh` to print an end-to-end mapping flow that walks each legacy table to its destination inside the refactored schema. The script mirrors the table above, but it also highlights when polymorphic join tables (`relationship_links`, `note_links`, etc.) absorb responsibilities that were previously handled by bespoke pivot tables. Because the mapping is generated programmatically, you can feed the output into documentation or migration tooling without reformatting by hand.【F:refactored_ddl.sh†L1-L172】
+Run `./refactored_ddl.sh` to print an end-to-end mapping flow that walks each legacy table to its destination inside the refactored schema. The script mirrors the table above, but it also highlights when polymorphic join tables (`relationship_links`, `note_links`, etc.) absorb responsibilities that were previously handled by bespoke pivot tables. Because the mapping is generated programmatically, you can feed the output into documentation or migration tooling without reformatting by hand. See [`refactored_ddl_mapping.md`](refactored_ddl_mapping.md) for a narrative walkthrough of the script's output structure and usage tips.【F:refactored_ddl.sh†L1-L172】【F:refactored_ddl_mapping.md†L1-L46】
 
 ## Working with polymorphic relationships
 
