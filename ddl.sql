@@ -22,11 +22,8 @@ CREATE TABLE activity_log (
   deleted_at timestamp without time zone DEFAULT NULL,
   PRIMARY KEY (id)
 );
-DROP INDEX IF EXISTS subject;
 CREATE INDEX subject ON activity_log (subject_type, subject_id);
-DROP INDEX IF EXISTS causer;
 CREATE INDEX causer ON activity_log (causer_type, causer_id);
-DROP INDEX IF EXISTS activity_log_log_name_index;
 CREATE INDEX activity_log_log_name_index ON activity_log (log_name);
 
 
@@ -539,7 +536,6 @@ CREATE TABLE jobs (
   created_at integer NOT NULL,
   PRIMARY KEY (id)
 );
-DROP INDEX IF EXISTS jobs_queue_index;
 CREATE INDEX jobs_queue_index ON jobs (queue);
 
 
@@ -663,7 +659,6 @@ CREATE TABLE password_resets (
   created_at timestamp without time zone DEFAULT NULL,
   PRIMARY KEY (my_row_id)
 );
-DROP INDEX IF EXISTS password_resets_email_index;
 CREATE INDEX password_resets_email_index ON password_resets (email);
 
 
@@ -744,7 +739,6 @@ CREATE TABLE personal_access_tokens (
   PRIMARY KEY (id),
   CONSTRAINT personal_access_tokens_token_unique UNIQUE (token)
 );
-DROP INDEX IF EXISTS personal_access_tokens_tokenable_type_tokenable_id_index;
 CREATE INDEX personal_access_tokens_tokenable_type_tokenable_id_index ON personal_access_tokens (tokenable_type, tokenable_id);
 
 
@@ -892,7 +886,6 @@ CREATE TABLE user_types (
   deleted_at timestamp without time zone DEFAULT NULL,
   PRIMARY KEY (id)
 );
-DROP INDEX IF EXISTS user_types_role_id_foreign;
 CREATE INDEX user_types_role_id_foreign ON user_types (role_id);
 
 
@@ -961,7 +954,6 @@ CREATE TABLE addresses (
   PRIMARY KEY (id),
   CONSTRAINT addresses_ibfk_1 FOREIGN KEY (ownership_type_id) REFERENCES ownership_types (id)
 );
-DROP INDEX IF EXISTS client_addresses_ownership_type_id_foreign;
 CREATE INDEX client_addresses_ownership_type_id_foreign ON addresses (ownership_type_id);
 
 
@@ -980,7 +972,6 @@ CREATE TABLE attribute_groups (
   CONSTRAINT attribute_groups_name_unique UNIQUE (name),
   CONSTRAINT attribute_groups_ibfk_1 FOREIGN KEY (attribute_entity_id) REFERENCES attribute_entities (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS attribute_groups_attribute_entity_id_foreign;
 CREATE INDEX attribute_groups_attribute_entity_id_foreign ON attribute_groups (attribute_entity_id);
 
 
@@ -1004,9 +995,7 @@ CREATE TABLE attributes (
   CONSTRAINT attributes_ibfk_1 FOREIGN KEY (attribute_group_id) REFERENCES attribute_groups (id) ON DELETE CASCADE,
   CONSTRAINT attributes_ibfk_2 FOREIGN KEY (attribute_type_id) REFERENCES attribute_types (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS attributes_attribute_group_id_foreign;
 CREATE INDEX attributes_attribute_group_id_foreign ON attributes (attribute_group_id);
-DROP INDEX IF EXISTS attributes_attribute_type_id_foreign;
 CREATE INDEX attributes_attribute_type_id_foreign ON attributes (attribute_type_id);
 
 
@@ -1035,9 +1024,7 @@ CREATE TABLE brokers (
   CONSTRAINT brokers_bank_details_id_foreign FOREIGN KEY (bank_details_id) REFERENCES bank_details (id),
   CONSTRAINT brokers_ibfk_1 FOREIGN KEY (address_id) REFERENCES addresses (id) ON DELETE SET NULL
 );
-DROP INDEX IF EXISTS brokers_address_id_foreign;
 CREATE INDEX brokers_address_id_foreign ON brokers (address_id);
-DROP INDEX IF EXISTS brokers_bank_details_id_foreign;
 CREATE INDEX brokers_bank_details_id_foreign ON brokers (bank_details_id);
 
 
@@ -1064,11 +1051,8 @@ CREATE TABLE client_companies (
   CONSTRAINT client_companies_ibfk_2 FOREIGN KEY (bank_details_id) REFERENCES bank_details (id),
   CONSTRAINT client_companies_ibfk_3 FOREIGN KEY (company_id) REFERENCES companies (id)
 );
-DROP INDEX IF EXISTS client_companies_company_id_foreign;
 CREATE INDEX client_companies_company_id_foreign ON client_companies (company_id);
-DROP INDEX IF EXISTS client_companies_address_id_foreign;
 CREATE INDEX client_companies_address_id_foreign ON client_companies (address_id);
-DROP INDEX IF EXISTS client_companies_bank_details_id_foreign;
 CREATE INDEX client_companies_bank_details_id_foreign ON client_companies (bank_details_id);
 
 
@@ -1095,11 +1079,8 @@ CREATE TABLE client_groups (
   CONSTRAINT client_groups_ibfk_2 FOREIGN KEY (bank_details_id) REFERENCES bank_details (id),
   CONSTRAINT client_groups_ibfk_3 FOREIGN KEY (company_id) REFERENCES companies (id)
 );
-DROP INDEX IF EXISTS client_groups_company_id_foreign;
 CREATE INDEX client_groups_company_id_foreign ON client_groups (company_id);
-DROP INDEX IF EXISTS client_groups_address_id_foreign;
 CREATE INDEX client_groups_address_id_foreign ON client_groups (address_id);
-DROP INDEX IF EXISTS client_groups_bank_details_id_foreign;
 CREATE INDEX client_groups_bank_details_id_foreign ON client_groups (bank_details_id);
 
 
@@ -1117,7 +1098,6 @@ CREATE TABLE documents (
   PRIMARY KEY (id),
   CONSTRAINT documents_ibfk_1 FOREIGN KEY (document_type_id) REFERENCES document_types (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS documents_document_type_id_foreign;
 CREATE INDEX documents_document_type_id_foreign ON documents (document_type_id);
 
 
@@ -1136,7 +1116,6 @@ CREATE TABLE drawdown_event_type (
   PRIMARY KEY (id),
   CONSTRAINT drawdown_event_type_ibfk_1 FOREIGN KEY (drawdown_event_amount_type_id) REFERENCES drawdown_event_amount_type (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS drawdown_event_type_drawdown_event_amount_type_id_foreign;
 CREATE INDEX drawdown_event_type_drawdown_event_amount_type_id_foreign ON drawdown_event_type (drawdown_event_amount_type_id);
 
 
@@ -1155,7 +1134,6 @@ CREATE TABLE fee_type_lending_type (
   CONSTRAINT fee_type_lending_type_fee_type_id_foreign FOREIGN KEY (fee_type_id) REFERENCES fee_type (id) ON DELETE CASCADE,
   CONSTRAINT fee_type_lending_type_lending_type_id_foreign FOREIGN KEY (lending_type_id) REFERENCES lending_types (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS fee_type_lending_type_lending_type_id_foreign;
 CREATE INDEX fee_type_lending_type_lending_type_id_foreign ON fee_type_lending_type (lending_type_id);
 
 
@@ -1176,7 +1154,6 @@ CREATE TABLE introducers (
   PRIMARY KEY (id),
   CONSTRAINT introducers_ibfk_1 FOREIGN KEY (introducer_type_id) REFERENCES introducer_type (id)
 );
-DROP INDEX IF EXISTS introducers_introducer_type_id_foreign;
 CREATE INDEX introducers_introducer_type_id_foreign ON introducers (introducer_type_id);
 
 
@@ -1195,7 +1172,6 @@ CREATE TABLE lenders (
   PRIMARY KEY (id),
   CONSTRAINT lenders_stripe_settings_id_foreign FOREIGN KEY (stripe_settings_id) REFERENCES stripe_settings (id) ON DELETE SET NULL
 );
-DROP INDEX IF EXISTS lenders_stripe_settings_id_foreign;
 CREATE INDEX lenders_stripe_settings_id_foreign ON lenders (stripe_settings_id);
 
 
@@ -1210,7 +1186,6 @@ CREATE TABLE model_has_roles (
   PRIMARY KEY (role_id,model_id,model_type),
   CONSTRAINT model_has_roles_ibfk_1 FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS model_has_roles_model_id_model_type_index;
 CREATE INDEX model_has_roles_model_id_model_type_index ON model_has_roles (model_id, model_type);
 
 
@@ -1234,9 +1209,7 @@ CREATE TABLE payment_attempts (
   CONSTRAINT payment_attempts_ibfk_1 FOREIGN KEY (payment_id) REFERENCES payments (id),
   CONSTRAINT payment_attempts_ibfk_2 FOREIGN KEY (payment_method_id) REFERENCES payment_providers (id) ON UPDATE CASCADE
 );
-DROP INDEX IF EXISTS payment_attempts_payment_id_foreign;
 CREATE INDEX payment_attempts_payment_id_foreign ON payment_attempts (payment_id);
-DROP INDEX IF EXISTS payment_attempts_payment_method_id_foreign;
 CREATE INDEX payment_attempts_payment_method_id_foreign ON payment_attempts (payment_method_id);
 
 
@@ -1257,9 +1230,7 @@ CREATE TABLE permissions (
   CONSTRAINT permissions_parent_id_foreign FOREIGN KEY (parent_id) REFERENCES permissions (id) ON DELETE CASCADE,
   CONSTRAINT permissions_permission_category_id_foreign FOREIGN KEY (permission_category_id) REFERENCES permission_category (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS permissions_permission_category_id_foreign;
 CREATE INDEX permissions_permission_category_id_foreign ON permissions (permission_category_id);
-DROP INDEX IF EXISTS permissions_parent_id_foreign;
 CREATE INDEX permissions_parent_id_foreign ON permissions (parent_id);
 
 
@@ -1274,7 +1245,6 @@ CREATE TABLE role_has_permissions (
   CONSTRAINT role_has_permissions_ibfk_1 FOREIGN KEY (permission_id) REFERENCES permissions (id) ON DELETE CASCADE,
   CONSTRAINT role_has_permissions_ibfk_2 FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS role_has_permissions_role_id_foreign;
 CREATE INDEX role_has_permissions_role_id_foreign ON role_has_permissions (role_id);
 
 
@@ -1297,7 +1267,6 @@ CREATE TABLE service_providers (
   PRIMARY KEY (id),
   CONSTRAINT service_providers_ibfk_1 FOREIGN KEY (provider_type_id) REFERENCES provider_types (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS service_providers_provider_type_id_foreign;
 CREATE INDEX service_providers_provider_type_id_foreign ON service_providers (provider_type_id);
 
 
@@ -1317,7 +1286,6 @@ CREATE TABLE systems_deal_setting (
   PRIMARY KEY (id),
   CONSTRAINT systems_deal_setting_ibfk_1 FOREIGN KEY (systems_deal_setting_group_id) REFERENCES systems_deal_setting_groups (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS systems_deal_setting_systems_deal_setting_group_id_foreign;
 CREATE INDEX systems_deal_setting_systems_deal_setting_group_id_foreign ON systems_deal_setting (systems_deal_setting_group_id);
 
 
@@ -1336,7 +1304,6 @@ CREATE TABLE task_group (
   PRIMARY KEY (id),
   CONSTRAINT task_group_lending_type_id_foreign FOREIGN KEY (lending_type_id) REFERENCES lending_types (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS task_group_lending_type_id_foreign;
 CREATE INDEX task_group_lending_type_id_foreign ON task_group (lending_type_id);
 
 
@@ -1356,9 +1323,7 @@ CREATE TABLE variable_rates (
   CONSTRAINT variable_rates_ibfk_1 FOREIGN KEY (parent_id) REFERENCES variable_rates (id) ON DELETE CASCADE,
   CONSTRAINT variable_rates_ibfk_2 FOREIGN KEY (variable_rate_source_id) REFERENCES variable_rate_sources (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS variable_rates_variable_rate_source_id_foreign;
 CREATE INDEX variable_rates_variable_rate_source_id_foreign ON variable_rates (variable_rate_source_id);
-DROP INDEX IF EXISTS variable_rates_parent_id_foreign;
 CREATE INDEX variable_rates_parent_id_foreign ON variable_rates (parent_id);
 
 
@@ -1377,7 +1342,6 @@ CREATE TABLE variable_rates_history (
   PRIMARY KEY (id),
   CONSTRAINT variable_rates_history_ibfk_1 FOREIGN KEY (variable_rate_source_id) REFERENCES variable_rate_sources (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS variable_rates_history_variable_rate_source_id_foreign;
 CREATE INDEX variable_rates_history_variable_rate_source_id_foreign ON variable_rates_history (variable_rate_source_id);
 
 
@@ -1395,7 +1359,6 @@ CREATE TABLE variable_rates_history_copy1 (
   PRIMARY KEY (id),
   CONSTRAINT variable_rates_history_copy1_ibfk_1 FOREIGN KEY (variable_rate_source_id) REFERENCES variable_rate_sources (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS variable_rates_history_variable_rate_source_id_foreign;
 CREATE INDEX variable_rates_history_variable_rate_source_id_foreign ON variable_rates_history_copy1 (variable_rate_source_id);
 
 
@@ -1413,7 +1376,6 @@ CREATE TABLE lender_funder_interest_rate (
   PRIMARY KEY (id),
   CONSTRAINT lender_funder_interest_rate_lender_id_foreign FOREIGN KEY (lender_id) REFERENCES lenders (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS lender_funder_interest_rate_lender_id_foreign;
 CREATE INDEX lender_funder_interest_rate_lender_id_foreign ON lender_funder_interest_rate (lender_id);
 
 
@@ -1428,7 +1390,6 @@ CREATE TABLE model_has_permissions (
   PRIMARY KEY (permission_id,model_id,model_type),
   CONSTRAINT model_has_permissions_ibfk_1 FOREIGN KEY (permission_id) REFERENCES permissions (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS model_has_permissions_model_id_model_type_index;
 CREATE INDEX model_has_permissions_model_id_model_type_index ON model_has_permissions (model_id, model_type);
 
 
@@ -1446,9 +1407,7 @@ CREATE TABLE permission_group_permission (
   CONSTRAINT permission_group_permission_permission_group_id_foreign FOREIGN KEY (permission_group_id) REFERENCES permission_groups (id) ON DELETE CASCADE,
   CONSTRAINT permission_group_permission_permission_id_foreign FOREIGN KEY (permission_id) REFERENCES permissions (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS permission_group_permission_permission_group_id_foreign;
 CREATE INDEX permission_group_permission_permission_group_id_foreign ON permission_group_permission (permission_group_id);
-DROP INDEX IF EXISTS permission_group_permission_permission_id_foreign;
 CREATE INDEX permission_group_permission_permission_id_foreign ON permission_group_permission (permission_id);
 
 
@@ -1468,7 +1427,6 @@ CREATE TABLE task (
   PRIMARY KEY (id),
   CONSTRAINT task_ibfk_1 FOREIGN KEY (task_group_id) REFERENCES task_group (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS task_task_group_id_foreign;
 CREATE INDEX task_task_group_id_foreign ON task (task_group_id);
 
 
@@ -1500,15 +1458,10 @@ CREATE TABLE assets (
   CONSTRAINT assets_ibfk_4 FOREIGN KEY (deal_id) REFERENCES deals (id) ON DELETE CASCADE,
   CONSTRAINT assets_ibfk_5 FOREIGN KEY (use_type_id) REFERENCES use_type (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS assets_asset_type_id_foreign;
 CREATE INDEX assets_asset_type_id_foreign ON assets (asset_type_id);
-DROP INDEX IF EXISTS assets_client_group_id_foreign;
 CREATE INDEX assets_client_group_id_foreign ON assets (client_group_id);
-DROP INDEX IF EXISTS assets_asset_address_id_foreign;
 CREATE INDEX assets_asset_address_id_foreign ON assets (asset_address_id);
-DROP INDEX IF EXISTS assets_use_type_id_foreign;
 CREATE INDEX assets_use_type_id_foreign ON assets (use_type_id);
-DROP INDEX IF EXISTS assets_deal_id_foreign;
 CREATE INDEX assets_deal_id_foreign ON assets (deal_id);
 
 
@@ -1532,9 +1485,7 @@ CREATE TABLE asset_insurances (
   CONSTRAINT asset_insurances_asset_insurance_type_id_foreign FOREIGN KEY (asset_insurance_type_id) REFERENCES asset_insurance_type (id) ON DELETE RESTRICT,
   CONSTRAINT asset_insurances_ibfk_1 FOREIGN KEY (asset_id) REFERENCES assets (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS asset_insurances_asset_id_foreign;
 CREATE INDEX asset_insurances_asset_id_foreign ON asset_insurances (asset_id);
-DROP INDEX IF EXISTS asset_insurances_asset_insurance_type_id_foreign;
 CREATE INDEX asset_insurances_asset_insurance_type_id_foreign ON asset_insurances (asset_insurance_type_id);
 
 
@@ -1553,9 +1504,7 @@ CREATE TABLE asset_insurance_notes (
   CONSTRAINT asset_insurance_notes_ibfk_1 FOREIGN KEY (asset_insurance_id) REFERENCES asset_insurances (id),
   CONSTRAINT asset_insurance_notes_ibfk_2 FOREIGN KEY (note_id) REFERENCES notes (id)
 );
-DROP INDEX IF EXISTS asset_insurance_notes_asset_insurance_id_foreign;
 CREATE INDEX asset_insurance_notes_asset_insurance_id_foreign ON asset_insurance_notes (asset_insurance_id);
-DROP INDEX IF EXISTS asset_insurance_notes_note_id_foreign;
 CREATE INDEX asset_insurance_notes_note_id_foreign ON asset_insurance_notes (note_id);
 
 
@@ -1574,9 +1523,7 @@ CREATE TABLE asset_client_individuals (
   CONSTRAINT asset_client_individuals_ibfk_1 FOREIGN KEY (asset_id) REFERENCES assets (id) ON DELETE CASCADE,
   CONSTRAINT asset_client_individuals_ibfk_2 FOREIGN KEY (client_individual_id) REFERENCES client_individuals (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS asset_client_individuals_asset_id_foreign;
 CREATE INDEX asset_client_individuals_asset_id_foreign ON asset_client_individuals (asset_id);
-DROP INDEX IF EXISTS asset_client_individuals_client_individual_id_foreign;
 CREATE INDEX asset_client_individuals_client_individual_id_foreign ON asset_client_individuals (client_individual_id);
 
 
@@ -1594,7 +1541,6 @@ CREATE TABLE asset_client_companies (
   PRIMARY KEY (id),
   CONSTRAINT asset_client_companies_ibfk_1 FOREIGN KEY (asset_id) REFERENCES assets (id)
 );
-DROP INDEX IF EXISTS asset_client_companies_asset_id_foreign;
 CREATE INDEX asset_client_companies_asset_id_foreign ON asset_client_companies (asset_id);
 
 
@@ -1614,9 +1560,7 @@ CREATE TABLE attribute_values (
   CONSTRAINT attribute_values_ibfk_1 FOREIGN KEY (attribute_id) REFERENCES attributes (id) ON DELETE CASCADE,
   CONSTRAINT attribute_values_ibfk_2 FOREIGN KEY (client_form_id) REFERENCES client_forms (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS attribute_values_attribute_id_foreign;
 CREATE INDEX attribute_values_attribute_id_foreign ON attribute_values (attribute_id);
-DROP INDEX IF EXISTS attribute_values_client_form_id_foreign;
 CREATE INDEX attribute_values_client_form_id_foreign ON attribute_values (client_form_id);
 
 
@@ -1646,9 +1590,7 @@ CREATE TABLE audit (
   CONSTRAINT audit_ibfk_1 FOREIGN KEY (deal_id) REFERENCES deals (id) ON DELETE CASCADE,
   CONSTRAINT audit_ibfk_2 FOREIGN KEY (user_id) REFERENCES users (id)
 );
-DROP INDEX IF EXISTS audit_user_id_foreign;
 CREATE INDEX audit_user_id_foreign ON audit (user_id);
-DROP INDEX IF EXISTS audit_deal_id_foreign;
 CREATE INDEX audit_deal_id_foreign ON audit (deal_id);
 
 
@@ -1680,19 +1622,12 @@ CREATE TABLE borrowers (
   CONSTRAINT borrowers_ibfk_3 FOREIGN KEY (client_individual_id) REFERENCES client_individuals (id) ON DELETE CASCADE,
   CONSTRAINT borrowers_ibfk_4 FOREIGN KEY (deal_id) REFERENCES deals (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS borrowers_deal_id_foreign;
 CREATE INDEX borrowers_deal_id_foreign ON borrowers (deal_id);
-DROP INDEX IF EXISTS borrowers_client_individual_id_foreign;
 CREATE INDEX borrowers_client_individual_id_foreign ON borrowers (client_individual_id);
-DROP INDEX IF EXISTS borrowers_client_company_id_foreign;
 CREATE INDEX borrowers_client_company_id_foreign ON borrowers (client_company_id);
-DROP INDEX IF EXISTS borrowers_client_group_id_foreign;
 CREATE INDEX borrowers_client_group_id_foreign ON borrowers (client_group_id);
-DROP INDEX IF EXISTS borrowers_admin_id_foreign;
 CREATE INDEX borrowers_admin_id_foreign ON borrowers (admin_id);
-DROP INDEX IF EXISTS borrowers_guarantor_individual_id_foreign;
 CREATE INDEX borrowers_guarantor_individual_id_foreign ON borrowers (guarantor_individual_id);
-DROP INDEX IF EXISTS borrowers_guarantor_corporate_id_foreign;
 CREATE INDEX borrowers_guarantor_corporate_id_foreign ON borrowers (guarantor_corporate_id);
 
 
@@ -1712,9 +1647,7 @@ CREATE TABLE broker_agent_deals (
   CONSTRAINT broker_agent_deals_ibfk_1 FOREIGN KEY (broker_agent_id) REFERENCES broker_agents (id) ON DELETE CASCADE,
   CONSTRAINT broker_agent_deals_ibfk_2 FOREIGN KEY (deal_id) REFERENCES deals (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS broker_agent_deals_broker_agent_id_foreign;
 CREATE INDEX broker_agent_deals_broker_agent_id_foreign ON broker_agent_deals (broker_agent_id);
-DROP INDEX IF EXISTS broker_agent_deals_deal_id_foreign;
 CREATE INDEX broker_agent_deals_deal_id_foreign ON broker_agent_deals (deal_id);
 
 
@@ -1734,9 +1667,7 @@ CREATE TABLE broker_agent_notes (
   CONSTRAINT broker_agent_notes_ibfk_1 FOREIGN KEY (broker_agent_id) REFERENCES broker_agents (id),
   CONSTRAINT broker_agent_notes_ibfk_2 FOREIGN KEY (note_id) REFERENCES notes (id)
 );
-DROP INDEX IF EXISTS broker_agent_notes_broker_agent_id_foreign;
 CREATE INDEX broker_agent_notes_broker_agent_id_foreign ON broker_agent_notes (broker_agent_id);
-DROP INDEX IF EXISTS broker_agent_notes_note_id_foreign;
 CREATE INDEX broker_agent_notes_note_id_foreign ON broker_agent_notes (note_id);
 
 
@@ -1765,13 +1696,9 @@ CREATE TABLE broker_agents (
   CONSTRAINT broker_agents_ibfk_3 FOREIGN KEY (broker_id) REFERENCES brokers (id) ON DELETE CASCADE,
   CONSTRAINT broker_agents_ibfk_4 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS broker_agents_user_id_foreign;
 CREATE INDEX broker_agents_user_id_foreign ON broker_agents (user_id);
-DROP INDEX IF EXISTS broker_agents_broker_id_foreign;
 CREATE INDEX broker_agents_broker_id_foreign ON broker_agents (broker_id);
-DROP INDEX IF EXISTS broker_agents_address_id_foreign;
 CREATE INDEX broker_agents_address_id_foreign ON broker_agents (address_id);
-DROP INDEX IF EXISTS broker_agents_bank_details_id_foreign;
 CREATE INDEX broker_agents_bank_details_id_foreign ON broker_agents (bank_details_id);
 
 
@@ -1790,9 +1717,7 @@ CREATE TABLE broker_notes (
   CONSTRAINT broker_notes_ibfk_1 FOREIGN KEY (broker_id) REFERENCES brokers (id),
   CONSTRAINT broker_notes_ibfk_2 FOREIGN KEY (note_id) REFERENCES notes (id)
 );
-DROP INDEX IF EXISTS broker_notes_broker_id_foreign;
 CREATE INDEX broker_notes_broker_id_foreign ON broker_notes (broker_id);
-DROP INDEX IF EXISTS broker_notes_note_id_foreign;
 CREATE INDEX broker_notes_note_id_foreign ON broker_notes (note_id);
 
 
@@ -1810,7 +1735,6 @@ CREATE TABLE ccr_reports (
   PRIMARY KEY (id),
   CONSTRAINT ccr_reports_ibfk_1 FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS ccr_reports_file_id_foreign;
 CREATE INDEX ccr_reports_file_id_foreign ON ccr_reports (file_id);
 
 
@@ -1837,13 +1761,9 @@ CREATE TABLE charges (
   CONSTRAINT charges_ibfk_3 FOREIGN KEY (lender_id) REFERENCES lenders (id) ON DELETE CASCADE,
   CONSTRAINT charges_ibfk_4 FOREIGN KEY (parent_id) REFERENCES charges (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS charges_lender_id_foreign;
 CREATE INDEX charges_lender_id_foreign ON charges (lender_id);
-DROP INDEX IF EXISTS charges_charge_type_id_foreign;
 CREATE INDEX charges_charge_type_id_foreign ON charges (charge_type_id);
-DROP INDEX IF EXISTS charges_parent_id_foreign;
 CREATE INDEX charges_parent_id_foreign ON charges (parent_id);
-DROP INDEX IF EXISTS charges_asset_id_foreign;
 CREATE INDEX charges_asset_id_foreign ON charges (asset_id);
 
 
@@ -1863,9 +1783,7 @@ CREATE TABLE client_company_clients (
   CONSTRAINT client_company_clients_ibfk_1 FOREIGN KEY (client_company_id) REFERENCES client_companies (id),
   CONSTRAINT client_company_clients_ibfk_2 FOREIGN KEY (client_individual_id) REFERENCES client_individuals (id)
 );
-DROP INDEX IF EXISTS client_company_clients_client_company_id_foreign;
 CREATE INDEX client_company_clients_client_company_id_foreign ON client_company_clients (client_company_id);
-DROP INDEX IF EXISTS client_company_clients_client_individual_id_foreign;
 CREATE INDEX client_company_clients_client_individual_id_foreign ON client_company_clients (client_individual_id);
 
 
@@ -1884,9 +1802,7 @@ CREATE TABLE client_company_notes (
   CONSTRAINT client_company_notes_ibfk_1 FOREIGN KEY (client_company_id) REFERENCES client_companies (id),
   CONSTRAINT client_company_notes_ibfk_2 FOREIGN KEY (note_id) REFERENCES notes (id)
 );
-DROP INDEX IF EXISTS client_company_notes_client_company_id_foreign;
 CREATE INDEX client_company_notes_client_company_id_foreign ON client_company_notes (client_company_id);
-DROP INDEX IF EXISTS client_company_notes_note_id_foreign;
 CREATE INDEX client_company_notes_note_id_foreign ON client_company_notes (note_id);
 
 
@@ -1906,9 +1822,7 @@ CREATE TABLE client_form_attachments (
   CONSTRAINT client_form_attachments_ibfk_1 FOREIGN KEY (client_form_id) REFERENCES client_forms (id) ON DELETE CASCADE,
   CONSTRAINT client_form_attachments_ibfk_2 FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS client_form_attachments_client_form_id_foreign;
 CREATE INDEX client_form_attachments_client_form_id_foreign ON client_form_attachments (client_form_id);
-DROP INDEX IF EXISTS client_form_attachments_file_id_foreign;
 CREATE INDEX client_form_attachments_file_id_foreign ON client_form_attachments (file_id);
 
 
@@ -1950,21 +1864,13 @@ CREATE TABLE client_forms (
   CONSTRAINT client_forms_ibfk_7 FOREIGN KEY (form_id) REFERENCES loan_custom_forms (id) ON DELETE CASCADE,
   CONSTRAINT client_forms_ibfk_8 FOREIGN KEY (sent_by_user_id) REFERENCES users (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS client_forms_form_id_foreign;
 CREATE INDEX client_forms_form_id_foreign ON client_forms (form_id);
-DROP INDEX IF EXISTS client_forms_client_id_foreign;
 CREATE INDEX client_forms_client_id_foreign ON client_forms (client_id);
-DROP INDEX IF EXISTS client_forms_client_company_id_foreign;
 CREATE INDEX client_forms_client_company_id_foreign ON client_forms (client_company_id);
-DROP INDEX IF EXISTS client_forms_client_group_id_foreign;
 CREATE INDEX client_forms_client_group_id_foreign ON client_forms (client_group_id);
-DROP INDEX IF EXISTS client_forms_client_form_status_id_foreign;
 CREATE INDEX client_forms_client_form_status_id_foreign ON client_forms (client_form_status_id);
-DROP INDEX IF EXISTS client_forms_broker_agent_id_foreign;
 CREATE INDEX client_forms_broker_agent_id_foreign ON client_forms (broker_agent_id);
-DROP INDEX IF EXISTS client_forms_deal_id_foreign;
 CREATE INDEX client_forms_deal_id_foreign ON client_forms (deal_id);
-DROP INDEX IF EXISTS client_forms_sent_by_user_id_foreign;
 CREATE INDEX client_forms_sent_by_user_id_foreign ON client_forms (sent_by_user_id);
 
 
@@ -1986,11 +1892,8 @@ CREATE TABLE client_group_clients (
   CONSTRAINT client_group_clients_ibfk_2 FOREIGN KEY (client_group_id) REFERENCES client_groups (id),
   CONSTRAINT client_group_clients_ibfk_3 FOREIGN KEY (client_individual_id) REFERENCES client_individuals (id)
 );
-DROP INDEX IF EXISTS client_group_clients_client_group_id_foreign;
 CREATE INDEX client_group_clients_client_group_id_foreign ON client_group_clients (client_group_id);
-DROP INDEX IF EXISTS client_group_clients_client_company_id_foreign;
 CREATE INDEX client_group_clients_client_company_id_foreign ON client_group_clients (client_company_id);
-DROP INDEX IF EXISTS client_group_clients_client_individual_id_foreign;
 CREATE INDEX client_group_clients_client_individual_id_foreign ON client_group_clients (client_individual_id);
 
 
@@ -2024,7 +1927,6 @@ CREATE TABLE client_individual_credit_data (
   PRIMARY KEY (id),
   CONSTRAINT client_individual_credit_data_client_individual_id_foreign FOREIGN KEY (client_individual_id) REFERENCES client_individuals (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS client_individual_credit_data_client_individual_id_foreign;
 CREATE INDEX client_individual_credit_data_client_individual_id_foreign ON client_individual_credit_data (client_individual_id);
 
 
@@ -2043,9 +1945,7 @@ CREATE TABLE client_individual_notes (
   CONSTRAINT client_individual_notes_ibfk_1 FOREIGN KEY (client_individual_id) REFERENCES client_individuals (id),
   CONSTRAINT client_individual_notes_ibfk_2 FOREIGN KEY (note_id) REFERENCES notes (id)
 );
-DROP INDEX IF EXISTS client_individual_notes_client_individual_id_foreign;
 CREATE INDEX client_individual_notes_client_individual_id_foreign ON client_individual_notes (client_individual_id);
-DROP INDEX IF EXISTS client_individual_notes_note_id_foreign;
 CREATE INDEX client_individual_notes_note_id_foreign ON client_individual_notes (note_id);
 
 
@@ -2083,13 +1983,9 @@ CREATE TABLE client_individuals (
   CONSTRAINT client_individuals_ibfk_3 FOREIGN KEY (name_title_id) REFERENCES name_titles (id),
   CONSTRAINT client_individuals_ibfk_4 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS client_individuals_user_id_foreign;
 CREATE INDEX client_individuals_user_id_foreign ON client_individuals (user_id);
-DROP INDEX IF EXISTS client_individuals_marital_status_id_foreign;
 CREATE INDEX client_individuals_marital_status_id_foreign ON client_individuals (marital_status_id);
-DROP INDEX IF EXISTS client_individuals_name_title_id_foreign;
 CREATE INDEX client_individuals_name_title_id_foreign ON client_individuals (name_title_id);
-DROP INDEX IF EXISTS client_individuals_address_id_foreign;
 CREATE INDEX client_individuals_address_id_foreign ON client_individuals (address_id);
 
 
@@ -2115,13 +2011,9 @@ CREATE TABLE deal_activities (
   CONSTRAINT deal_activities_ibfk_3 FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE CASCADE,
   CONSTRAINT deal_activities_ibfk_4 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS deal_activities_deal_id_foreign;
 CREATE INDEX deal_activities_deal_id_foreign ON deal_activities (deal_id);
-DROP INDEX IF EXISTS deal_activities_user_id_foreign;
 CREATE INDEX deal_activities_user_id_foreign ON deal_activities (user_id);
-DROP INDEX IF EXISTS deal_activities_audit_id_foreign;
 CREATE INDEX deal_activities_audit_id_foreign ON deal_activities (audit_id);
-DROP INDEX IF EXISTS deal_activities_file_id_foreign;
 CREATE INDEX deal_activities_file_id_foreign ON deal_activities (file_id);
 
 
@@ -2146,9 +2038,7 @@ CREATE TABLE deal_document_categories (
   CONSTRAINT deal_document_categories_ibfk_1 FOREIGN KEY (deal_id) REFERENCES deals (id) ON DELETE CASCADE,
   CONSTRAINT deal_document_categories_ibfk_2 FOREIGN KEY (parent_id) REFERENCES deal_document_categories (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS deal_document_categories_parent_id_foreign;
 CREATE INDEX deal_document_categories_parent_id_foreign ON deal_document_categories (parent_id);
-DROP INDEX IF EXISTS deal_document_categories_deal_id_foreign;
 CREATE INDEX deal_document_categories_deal_id_foreign ON deal_document_categories (deal_id);
 
 
@@ -2170,9 +2060,7 @@ CREATE TABLE deal_document_categories_data (
   CONSTRAINT deal_document_categories_data_ibfk_1 FOREIGN KEY (deal_document_category_id) REFERENCES deal_document_categories (id) ON DELETE CASCADE,
   CONSTRAINT deal_document_categories_data_ibfk_2 FOREIGN KEY (deal_id) REFERENCES deals (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS deal_document_categories_data_deal_id_foreign;
 CREATE INDEX deal_document_categories_data_deal_id_foreign ON deal_document_categories_data (deal_id);
-DROP INDEX IF EXISTS deal_document_categories_data_deal_document_category_id_foreign;
 CREATE INDEX deal_document_categories_data_deal_document_category_id_foreign ON deal_document_categories_data (deal_document_category_id);
 
 
@@ -2204,21 +2092,13 @@ CREATE TABLE deal_documents (
   CONSTRAINT deal_documents_ibfk_7 FOREIGN KEY (deal_id) REFERENCES deals (id) ON DELETE CASCADE,
   CONSTRAINT deal_documents_ibfk_8 FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS deal_documents_file_id_foreign;
 CREATE INDEX deal_documents_file_id_foreign ON deal_documents (file_id);
-DROP INDEX IF EXISTS deal_documents_deal_document_category_id_foreign;
 CREATE INDEX deal_documents_deal_document_category_id_foreign ON deal_documents (deal_document_category_id);
-DROP INDEX IF EXISTS deal_documents_borrower_id_foreign;
 CREATE INDEX deal_documents_borrower_id_foreign ON deal_documents (borrower_id);
-DROP INDEX IF EXISTS deal_documents_client_individual_id_foreign;
 CREATE INDEX deal_documents_client_individual_id_foreign ON deal_documents (client_individual_id);
-DROP INDEX IF EXISTS deal_documents_asset_id_foreign;
 CREATE INDEX deal_documents_asset_id_foreign ON deal_documents (asset_id);
-DROP INDEX IF EXISTS deal_documents_deal_id_foreign;
 CREATE INDEX deal_documents_deal_id_foreign ON deal_documents (deal_id);
-DROP INDEX IF EXISTS deal_documents_client_company_id_foreign;
 CREATE INDEX deal_documents_client_company_id_foreign ON deal_documents (client_company_id);
-DROP INDEX IF EXISTS deal_documents_deal_document_risk_id_foreign;
 CREATE INDEX deal_documents_deal_document_risk_id_foreign ON deal_documents (deal_document_risk_id);
 
 
@@ -2241,13 +2121,9 @@ CREATE TABLE deal_introducers (
   CONSTRAINT deal_introducers_ibfk_3 FOREIGN KEY (introducer_id) REFERENCES introducers (id),
   CONSTRAINT deal_introducers_ibfk_4 FOREIGN KEY (introducer_type_id) REFERENCES introducer_type (id)
 );
-DROP INDEX IF EXISTS deal_introducers_introducer_id_foreign;
 CREATE INDEX deal_introducers_introducer_id_foreign ON deal_introducers (introducer_id);
-DROP INDEX IF EXISTS deal_introducers_deal_id_foreign;
 CREATE INDEX deal_introducers_deal_id_foreign ON deal_introducers (deal_id);
-DROP INDEX IF EXISTS deal_introducers_broker_id_foreign;
 CREATE INDEX deal_introducers_broker_id_foreign ON deal_introducers (broker_id);
-DROP INDEX IF EXISTS deal_introducers_introducer_type_id_foreign;
 CREATE INDEX deal_introducers_introducer_type_id_foreign ON deal_introducers (introducer_type_id);
 
 
@@ -2270,11 +2146,8 @@ CREATE TABLE deal_notes (
   CONSTRAINT deal_notes_ibfk_2 FOREIGN KEY (deal_id) REFERENCES deals (id),
   CONSTRAINT deal_notes_ibfk_3 FOREIGN KEY (replied_to_id) REFERENCES deal_notes (id)
 );
-DROP INDEX IF EXISTS deal_notes_deal_id_foreign;
 CREATE INDEX deal_notes_deal_id_foreign ON deal_notes (deal_id);
-DROP INDEX IF EXISTS deal_notes_replied_to_id_foreign;
 CREATE INDEX deal_notes_replied_to_id_foreign ON deal_notes (replied_to_id);
-DROP INDEX IF EXISTS deal_notes_created_by_user_id_foreign;
 CREATE INDEX deal_notes_created_by_user_id_foreign ON deal_notes (created_by_user_id);
 
 
@@ -2304,15 +2177,10 @@ CREATE TABLE deal_notification_rules (
   CONSTRAINT deal_notification_rules_ibfk_4 FOREIGN KEY (notification_rule_id) REFERENCES notification_rules (id) ON DELETE CASCADE,
   CONSTRAINT deal_notification_rules_ibfk_5 FOREIGN KEY (notification_template_id) REFERENCES notification_templates (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS deal_notification_rules_notification_rule_id_foreign;
 CREATE INDEX deal_notification_rules_notification_rule_id_foreign ON deal_notification_rules (notification_rule_id);
-DROP INDEX IF EXISTS deal_notification_rules_deal_id_foreign;
 CREATE INDEX deal_notification_rules_deal_id_foreign ON deal_notification_rules (deal_id);
-DROP INDEX IF EXISTS deal_notification_rules_drawdown_event_type_id_foreign;
 CREATE INDEX deal_notification_rules_drawdown_event_type_id_foreign ON deal_notification_rules (drawdown_event_type_id);
-DROP INDEX IF EXISTS deal_notification_rules_file_id_foreign;
 CREATE INDEX deal_notification_rules_file_id_foreign ON deal_notification_rules (file_id);
-DROP INDEX IF EXISTS deal_notification_rules_notification_template_id_foreign;
 CREATE INDEX deal_notification_rules_notification_template_id_foreign ON deal_notification_rules (notification_template_id);
 
 
@@ -2331,9 +2199,7 @@ CREATE TABLE deal_notification_rules_recipients (
   CONSTRAINT deal_notification_rules_recipients_ibfk_1 FOREIGN KEY (client_individual_id) REFERENCES client_individuals (id) ON DELETE CASCADE,
   CONSTRAINT deal_notification_rules_recipients_ibfk_2 FOREIGN KEY (deal_notification_rule_id) REFERENCES deal_notification_rules (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS fk_deal_noti_rule_id;
 CREATE INDEX fk_deal_noti_rule_id ON deal_notification_rules_recipients (deal_notification_rule_id);
-DROP INDEX IF EXISTS deal_notification_rules_recipients_client_individual_id_foreign;
 CREATE INDEX deal_notification_rules_recipients_client_individual_id_foreign ON deal_notification_rules_recipients (client_individual_id);
 
 
@@ -2351,9 +2217,7 @@ CREATE TABLE deal_rate_floors (
   CONSTRAINT deal_rate_floors_ibfk_1 FOREIGN KEY (deal_id) REFERENCES deals (id) ON DELETE CASCADE,
   CONSTRAINT deal_rate_floors_ibfk_2 FOREIGN KEY (variable_source_id) REFERENCES variable_rate_sources (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS deal_rate_floors_variable_source_id_foreign;
 CREATE INDEX deal_rate_floors_variable_source_id_foreign ON deal_rate_floors (variable_source_id);
-DROP INDEX IF EXISTS deal_rate_floors_deal_id_foreign;
 CREATE INDEX deal_rate_floors_deal_id_foreign ON deal_rate_floors (deal_id);
 
 
@@ -2372,7 +2236,6 @@ CREATE TABLE deal_setting_groups (
   PRIMARY KEY (id),
   CONSTRAINT deal_setting_groups_ibfk_1 FOREIGN KEY (deal_id) REFERENCES deals (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS deal_setting_groups_deal_id_foreign;
 CREATE INDEX deal_setting_groups_deal_id_foreign ON deal_setting_groups (deal_id);
 
 
@@ -2392,7 +2255,6 @@ CREATE TABLE deal_settings (
   PRIMARY KEY (id),
   CONSTRAINT deal_settings_ibfk_1 FOREIGN KEY (deal_setting_group_id) REFERENCES deal_setting_groups (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS deal_settings_deal_setting_group_id_foreign;
 CREATE INDEX deal_settings_deal_setting_group_id_foreign ON deal_settings (deal_setting_group_id);
 
 
@@ -2420,11 +2282,8 @@ CREATE TABLE deal_task (
   CONSTRAINT deal_task_ibfk_2 FOREIGN KEY (assigned_to_user_id) REFERENCES users (id) ON DELETE CASCADE,
   CONSTRAINT deal_task_ibfk_3 FOREIGN KEY (deal_task_group_id) REFERENCES deal_task_group (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS deal_task_deal_task_group_id_foreign;
 CREATE INDEX deal_task_deal_task_group_id_foreign ON deal_task (deal_task_group_id);
-DROP INDEX IF EXISTS deal_task_actioned_by_user_id_foreign;
 CREATE INDEX deal_task_actioned_by_user_id_foreign ON deal_task (actioned_by_user_id);
-DROP INDEX IF EXISTS deal_task_assigned_to_user_id_foreign;
 CREATE INDEX deal_task_assigned_to_user_id_foreign ON deal_task (assigned_to_user_id);
 
 
@@ -2443,7 +2302,6 @@ CREATE TABLE deal_task_group (
   PRIMARY KEY (id),
   CONSTRAINT deal_task_group_ibfk_1 FOREIGN KEY (deal_id) REFERENCES deals (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS deal_task_group_deal_id_foreign;
 CREATE INDEX deal_task_group_deal_id_foreign ON deal_task_group (deal_id);
 
 
@@ -2515,37 +2373,21 @@ CREATE TABLE deals (
   CONSTRAINT deals_interest_type_id_foreign FOREIGN KEY (interest_type_id) REFERENCES interest_types (id) ON DELETE SET NULL,
   CONSTRAINT deals_lending_type_id_foreign FOREIGN KEY (lending_type_id) REFERENCES lending_types (id) ON DELETE SET NULL
 );
-DROP INDEX IF EXISTS deals_type_id_foreign;
 CREATE INDEX deals_type_id_foreign ON deals (type_id);
-DROP INDEX IF EXISTS deals_status_id_foreign;
 CREATE INDEX deals_status_id_foreign ON deals (status_id);
-DROP INDEX IF EXISTS deals_guarantor_id_foreign;
 CREATE INDEX deals_guarantor_id_foreign ON deals (guarantor_id);
-DROP INDEX IF EXISTS deals_currency_id_foreign;
 CREATE INDEX deals_currency_id_foreign ON deals (currency_id);
-DROP INDEX IF EXISTS deals_client_group_id_foreign;
 CREATE INDEX deals_client_group_id_foreign ON deals (client_group_id);
-DROP INDEX IF EXISTS deals_marketing_source_id_foreign;
 CREATE INDEX deals_marketing_source_id_foreign ON deals (marketing_source_id);
-DROP INDEX IF EXISTS deals_case_owner_id_foreign;
 CREATE INDEX deals_case_owner_id_foreign ON deals (case_owner_id);
-DROP INDEX IF EXISTS deals_purpose_credit_type_id_foreign;
 CREATE INDEX deals_purpose_credit_type_id_foreign ON deals (purpose_credit_type_id);
-DROP INDEX IF EXISTS deals_parent_id_foreign;
 CREATE INDEX deals_parent_id_foreign ON deals (parent_id);
-DROP INDEX IF EXISTS deals_approval_requested_by_foreign;
 CREATE INDEX deals_approval_requested_by_foreign ON deals (approval_requested_by);
-DROP INDEX IF EXISTS deals_approved_by_foreign;
 CREATE INDEX deals_approved_by_foreign ON deals (approved_by);
-DROP INDEX IF EXISTS deals_aborted_reason_id_foreign;
 CREATE INDEX deals_aborted_reason_id_foreign ON deals (aborted_reason_id);
-DROP INDEX IF EXISTS deals_previous_status_id_foreign;
 CREATE INDEX deals_previous_status_id_foreign ON deals (previous_status_id);
-DROP INDEX IF EXISTS deals_lending_type_id_foreign;
 CREATE INDEX deals_lending_type_id_foreign ON deals (lending_type_id);
-DROP INDEX IF EXISTS deals_interest_calculation_type_id_foreign;
 CREATE INDEX deals_interest_calculation_type_id_foreign ON deals (interest_calculation_type_id);
-DROP INDEX IF EXISTS deals_interest_type_id_foreign;
 CREATE INDEX deals_interest_type_id_foreign ON deals (interest_type_id);
 
 
@@ -2564,9 +2406,7 @@ CREATE TABLE delegated_owners (
   CONSTRAINT delegated_owners_ibfk_1 FOREIGN KEY (deal_id) REFERENCES deals (id) ON DELETE CASCADE,
   CONSTRAINT delegated_owners_ibfk_2 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS delegated_owners_user_id_foreign;
 CREATE INDEX delegated_owners_user_id_foreign ON delegated_owners (user_id);
-DROP INDEX IF EXISTS delegated_owners_deal_id_foreign;
 CREATE INDEX delegated_owners_deal_id_foreign ON delegated_owners (deal_id);
 
 
@@ -2598,13 +2438,9 @@ CREATE TABLE drawdown_events (
   CONSTRAINT drawdown_events_ibfk_3 FOREIGN KEY (event_type_id) REFERENCES drawdown_event_type (id) ON DELETE CASCADE,
   CONSTRAINT drawdown_events_ibfk_4 FOREIGN KEY (variable_rate_source_id) REFERENCES variable_rate_sources (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS drawdown_events_drawdown_id_foreign;
 CREATE INDEX drawdown_events_drawdown_id_foreign ON drawdown_events (drawdown_id);
-DROP INDEX IF EXISTS drawdown_events_event_type_id_foreign;
 CREATE INDEX drawdown_events_event_type_id_foreign ON drawdown_events (event_type_id);
-DROP INDEX IF EXISTS drawdown_events_event_status_id_foreign;
 CREATE INDEX drawdown_events_event_status_id_foreign ON drawdown_events (event_status_id);
-DROP INDEX IF EXISTS drawdown_events_variable_rate_source_id_foreign;
 CREATE INDEX drawdown_events_variable_rate_source_id_foreign ON drawdown_events (variable_rate_source_id);
 
 
@@ -2650,17 +2486,11 @@ CREATE TABLE drawdown_fees (
   CONSTRAINT drawdown_fees_fee_type_id_foreign FOREIGN KEY (fee_type_id) REFERENCES fee_type (id),
   CONSTRAINT drawdown_fees_service_provider_id_foreign FOREIGN KEY (service_provider_id) REFERENCES service_providers (id)
 );
-DROP INDEX IF EXISTS drawdown_fees_fee_status_id_foreign;
 CREATE INDEX drawdown_fees_fee_status_id_foreign ON drawdown_fees (fee_status_id);
-DROP INDEX IF EXISTS drawdown_fees_fee_type_id_foreign;
 CREATE INDEX drawdown_fees_fee_type_id_foreign ON drawdown_fees (fee_type_id);
-DROP INDEX IF EXISTS drawdown_fees_service_provider_id_foreign;
 CREATE INDEX drawdown_fees_service_provider_id_foreign ON drawdown_fees (service_provider_id);
-DROP INDEX IF EXISTS drawdown_fees_currency_id_foreign;
 CREATE INDEX drawdown_fees_currency_id_foreign ON drawdown_fees (currency_id);
-DROP INDEX IF EXISTS drawdown_fees_drawdown_id_foreign;
 CREATE INDEX drawdown_fees_drawdown_id_foreign ON drawdown_fees (drawdown_id);
-DROP INDEX IF EXISTS drawdown_fees_broker_agent_id_foreign;
 CREATE INDEX drawdown_fees_broker_agent_id_foreign ON drawdown_fees (broker_agent_id);
 
 
@@ -2681,9 +2511,7 @@ CREATE TABLE drawdown_fields_approval (
   CONSTRAINT drawdown_fields_approval_ibfk_1 FOREIGN KEY (approved_by) REFERENCES users (id) ON DELETE CASCADE,
   CONSTRAINT drawdown_fields_approval_ibfk_2 FOREIGN KEY (drawdown_id) REFERENCES drawdowns (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS drawdown_fields_approval_approved_by_foreign;
 CREATE INDEX drawdown_fields_approval_approved_by_foreign ON drawdown_fields_approval (approved_by);
-DROP INDEX IF EXISTS drawdown_fields_approval_drawdown_id_foreign;
 CREATE INDEX drawdown_fields_approval_drawdown_id_foreign ON drawdown_fields_approval (drawdown_id);
 
 
@@ -2799,45 +2627,25 @@ CREATE TABLE drawdowns (
   CONSTRAINT drawdowns_second_approval_user_id_foreign FOREIGN KEY (second_approval_user_id) REFERENCES users (id),
   CONSTRAINT drawdowns_submitted_by_user_id_foreign FOREIGN KEY (submitted_by_user_id) REFERENCES users (id)
 );
-DROP INDEX IF EXISTS drawdowns_drawdown_status_id_foreign;
 CREATE INDEX drawdowns_drawdown_status_id_foreign ON drawdowns (drawdown_status_id);
-DROP INDEX IF EXISTS drawdowns_deal_id_foreign;
 CREATE INDEX drawdowns_deal_id_foreign ON drawdowns (deal_id);
-DROP INDEX IF EXISTS drawdowns_lender_id_foreign;
 CREATE INDEX drawdowns_lender_id_foreign ON drawdowns (lender_id);
-DROP INDEX IF EXISTS drawdowns_interest_calculation_type_id_foreign;
 CREATE INDEX drawdowns_interest_calculation_type_id_foreign ON drawdowns (interest_calculation_type_id);
-DROP INDEX IF EXISTS drawdowns_deal_type_id_foreign;
 CREATE INDEX drawdowns_deal_type_id_foreign ON drawdowns (deal_type_id);
-DROP INDEX IF EXISTS drawdowns_interest_type_id_foreign;
 CREATE INDEX drawdowns_interest_type_id_foreign ON drawdowns (interest_type_id);
-DROP INDEX IF EXISTS drawdowns_loan_calculation_method_id_foreign;
 CREATE INDEX drawdowns_loan_calculation_method_id_foreign ON drawdowns (loan_calculation_method_id);
-DROP INDEX IF EXISTS drawdowns_asset_type_id_foreign;
 CREATE INDEX drawdowns_asset_type_id_foreign ON drawdowns (asset_type_id);
-DROP INDEX IF EXISTS drawdowns_variable_rate_source_id_foreign;
 CREATE INDEX drawdowns_variable_rate_source_id_foreign ON drawdowns (variable_rate_source_id);
-DROP INDEX IF EXISTS drawdowns_variable_rate_id_foreign;
 CREATE INDEX drawdowns_variable_rate_id_foreign ON drawdowns (variable_rate_id);
-DROP INDEX IF EXISTS drawdowns_refinanced_from_id_foreign;
 CREATE INDEX drawdowns_refinanced_from_id_foreign ON drawdowns (refinanced_from_id);
-DROP INDEX IF EXISTS drawdowns_refinanced_to_id_foreign;
 CREATE INDEX drawdowns_refinanced_to_id_foreign ON drawdowns (refinanced_to_id);
-DROP INDEX IF EXISTS drawdowns_hybrid_parent_id_foreign;
 CREATE INDEX drawdowns_hybrid_parent_id_foreign ON drawdowns (hybrid_parent_id);
-DROP INDEX IF EXISTS drawdowns_marketing_channel_id_foreign;
 CREATE INDEX drawdowns_marketing_channel_id_foreign ON drawdowns (marketing_channel_id);
-DROP INDEX IF EXISTS drawdowns_extended_from_foreign;
 CREATE INDEX drawdowns_extended_from_foreign ON drawdowns (extended_from);
-DROP INDEX IF EXISTS drawdowns_interest_subtype_id_foreign;
 CREATE INDEX drawdowns_interest_subtype_id_foreign ON drawdowns (interest_subtype_id);
-DROP INDEX IF EXISTS drawdowns_profile_approval_status_id_foreign;
 CREATE INDEX drawdowns_profile_approval_status_id_foreign ON drawdowns (profile_approval_status_id);
-DROP INDEX IF EXISTS drawdowns_first_approval_user_id_foreign;
 CREATE INDEX drawdowns_first_approval_user_id_foreign ON drawdowns (first_approval_user_id);
-DROP INDEX IF EXISTS drawdowns_second_approval_user_id_foreign;
 CREATE INDEX drawdowns_second_approval_user_id_foreign ON drawdowns (second_approval_user_id);
-DROP INDEX IF EXISTS drawdowns_submitted_by_user_id_foreign;
 CREATE INDEX drawdowns_submitted_by_user_id_foreign ON drawdowns (submitted_by_user_id);
 
 
@@ -2855,7 +2663,6 @@ CREATE TABLE email_code_authentication (
   PRIMARY KEY (id),
   CONSTRAINT email_code_authentication_ibfk_1 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS email_code_authentication_user_id_foreign;
 CREATE INDEX email_code_authentication_user_id_foreign ON email_code_authentication (user_id);
 
 
@@ -2874,7 +2681,6 @@ CREATE TABLE exit_fee_tiers (
   PRIMARY KEY (id),
   CONSTRAINT exit_fee_tiers_ibfk_1 FOREIGN KEY (deal_id) REFERENCES deals (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS exit_fee_tiers_deal_id_foreign;
 CREATE INDEX exit_fee_tiers_deal_id_foreign ON exit_fee_tiers (deal_id);
 
 
@@ -2920,17 +2726,11 @@ CREATE TABLE fees (
   CONSTRAINT fees_ibfk_5 FOREIGN KEY (fee_type_id) REFERENCES fee_type (id),
   CONSTRAINT fees_ibfk_6 FOREIGN KEY (service_provider_id) REFERENCES service_providers (id)
 );
-DROP INDEX IF EXISTS fees_fee_status_id_foreign;
 CREATE INDEX fees_fee_status_id_foreign ON fees (fee_status_id);
-DROP INDEX IF EXISTS fees_fee_type_id_foreign;
 CREATE INDEX fees_fee_type_id_foreign ON fees (fee_type_id);
-DROP INDEX IF EXISTS fees_service_provider_id_foreign;
 CREATE INDEX fees_service_provider_id_foreign ON fees (service_provider_id);
-DROP INDEX IF EXISTS fees_currency_id_foreign;
 CREATE INDEX fees_currency_id_foreign ON fees (currency_id);
-DROP INDEX IF EXISTS fees_deal_id_foreign;
 CREATE INDEX fees_deal_id_foreign ON fees (deal_id);
-DROP INDEX IF EXISTS fees_broker_agent_id_foreign;
 CREATE INDEX fees_broker_agent_id_foreign ON fees (broker_agent_id);
 
 
@@ -2957,9 +2757,7 @@ CREATE TABLE files (
   CONSTRAINT files_ibfk_1 FOREIGN KEY (deal_document_category_id) REFERENCES deal_document_categories (id) ON DELETE CASCADE,
   CONSTRAINT files_ibfk_2 FOREIGN KEY (user_id) REFERENCES users (id)
 );
-DROP INDEX IF EXISTS files_user_id_foreign;
 CREATE INDEX files_user_id_foreign ON files (user_id);
-DROP INDEX IF EXISTS files_deal_document_category_id_foreign;
 CREATE INDEX files_deal_document_category_id_foreign ON files (deal_document_category_id);
 
 
@@ -2984,15 +2782,10 @@ CREATE TABLE guarantors (
   CONSTRAINT guarantors_ibfk_3 FOREIGN KEY (client_individual_id) REFERENCES client_individuals (id) ON DELETE CASCADE,
   CONSTRAINT guarantors_ibfk_4 FOREIGN KEY (deal_id) REFERENCES deals (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS guarantors_deal_id_foreign;
 CREATE INDEX guarantors_deal_id_foreign ON guarantors (deal_id);
-DROP INDEX IF EXISTS guarantors_client_individual_id_foreign;
 CREATE INDEX guarantors_client_individual_id_foreign ON guarantors (client_individual_id);
-DROP INDEX IF EXISTS guarantors_client_company_id_foreign;
 CREATE INDEX guarantors_client_company_id_foreign ON guarantors (client_company_id);
-DROP INDEX IF EXISTS guarantors_client_group_id_foreign;
 CREATE INDEX guarantors_client_group_id_foreign ON guarantors (client_group_id);
-DROP INDEX IF EXISTS guarantors_guarantor_type_id_foreign;
 CREATE INDEX guarantors_guarantor_type_id_foreign ON guarantors (guarantor_type_id);
 
 
@@ -3011,9 +2804,7 @@ CREATE TABLE lender_operational_team_admin (
   CONSTRAINT lender_operational_team_admin_ibfk_1 FOREIGN KEY (lender_id) REFERENCES lenders (id) ON DELETE CASCADE,
   CONSTRAINT lender_operational_team_admin_ibfk_2 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS lender_operational_team_admin_user_id_foreign;
 CREATE INDEX lender_operational_team_admin_user_id_foreign ON lender_operational_team_admin (user_id);
-DROP INDEX IF EXISTS lender_operational_team_admin_lender_id_foreign;
 CREATE INDEX lender_operational_team_admin_lender_id_foreign ON lender_operational_team_admin (lender_id);
 
 
@@ -3033,9 +2824,7 @@ CREATE TABLE linked_deals (
   CONSTRAINT linked_deals_ibfk_1 FOREIGN KEY (deal_id) REFERENCES deals (id),
   CONSTRAINT linked_deals_ibfk_2 FOREIGN KEY (linked_deal_id) REFERENCES deals (id)
 );
-DROP INDEX IF EXISTS linked_deals_deal_id_foreign;
 CREATE INDEX linked_deals_deal_id_foreign ON linked_deals (deal_id);
-DROP INDEX IF EXISTS linked_deals_linked_deal_id_foreign;
 CREATE INDEX linked_deals_linked_deal_id_foreign ON linked_deals (linked_deal_id);
 
 
@@ -3058,13 +2847,9 @@ CREATE TABLE loan_administrators (
   CONSTRAINT loan_administrators_ibfk_3 FOREIGN KEY (client_individual_id) REFERENCES client_individuals (id) ON DELETE CASCADE,
   CONSTRAINT loan_administrators_ibfk_4 FOREIGN KEY (deal_id) REFERENCES deals (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS loan_administrators_deal_id_foreign;
 CREATE INDEX loan_administrators_deal_id_foreign ON loan_administrators (deal_id);
-DROP INDEX IF EXISTS loan_administrators_client_individual_id_foreign;
 CREATE INDEX loan_administrators_client_individual_id_foreign ON loan_administrators (client_individual_id);
-DROP INDEX IF EXISTS loan_administrators_client_company_id_foreign;
 CREATE INDEX loan_administrators_client_company_id_foreign ON loan_administrators (client_company_id);
-DROP INDEX IF EXISTS loan_administrators_client_group_id_foreign;
 CREATE INDEX loan_administrators_client_group_id_foreign ON loan_administrators (client_group_id);
 
 
@@ -3090,9 +2875,7 @@ CREATE TABLE loan_custom_forms (
   CONSTRAINT loan_custom_forms_ibfk_1 FOREIGN KEY (created_by) REFERENCES users (id),
   CONSTRAINT loan_custom_forms_ibfk_2 FOREIGN KEY (form_type_id) REFERENCES form_types (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS loan_custom_forms_created_by_foreign;
 CREATE INDEX loan_custom_forms_created_by_foreign ON loan_custom_forms (created_by);
-DROP INDEX IF EXISTS loan_custom_forms_form_type_id_foreign;
 CREATE INDEX loan_custom_forms_form_type_id_foreign ON loan_custom_forms (form_type_id);
 
 
@@ -3112,7 +2895,6 @@ CREATE TABLE margin_override (
   PRIMARY KEY (id),
   CONSTRAINT margin_override_ibfk_1 FOREIGN KEY (drawdown_id) REFERENCES drawdowns (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS margin_override_drawdown_id_foreign;
 CREATE INDEX margin_override_drawdown_id_foreign ON margin_override (drawdown_id);
 
 
@@ -3130,7 +2912,6 @@ CREATE TABLE notes (
   PRIMARY KEY (id),
   CONSTRAINT notes_ibfk_1 FOREIGN KEY (created_by) REFERENCES users (id)
 );
-DROP INDEX IF EXISTS notes_created_by_foreign;
 CREATE INDEX notes_created_by_foreign ON notes (created_by);
 
 
@@ -3155,15 +2936,10 @@ CREATE TABLE notification (
   CONSTRAINT notification_ibfk_4 FOREIGN KEY (drawdown_id) REFERENCES drawdowns (id) ON DELETE CASCADE,
   CONSTRAINT notification_ibfk_5 FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS notification_deal_id_foreign;
 CREATE INDEX notification_deal_id_foreign ON notification (deal_id);
-DROP INDEX IF EXISTS notification_drawdown_id_foreign;
 CREATE INDEX notification_drawdown_id_foreign ON notification (drawdown_id);
-DROP INDEX IF EXISTS notification_drawdown_event_type_id_foreign;
 CREATE INDEX notification_drawdown_event_type_id_foreign ON notification (drawdown_event_type_id);
-DROP INDEX IF EXISTS notification_file_id_foreign;
 CREATE INDEX notification_file_id_foreign ON notification (file_id);
-DROP INDEX IF EXISTS fk_noti_deal_noti_rule_id;
 CREATE INDEX fk_noti_deal_noti_rule_id ON notification (deal_notification_rule_id);
 
 
@@ -3185,7 +2961,6 @@ CREATE TABLE notification_recipients (
   PRIMARY KEY (id),
   CONSTRAINT notification_recipients_ibfk_1 FOREIGN KEY (notification_id) REFERENCES notification (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS notification_recipients_notification_id_foreign;
 CREATE INDEX notification_recipients_notification_id_foreign ON notification_recipients (notification_id);
 
 
@@ -3213,13 +2988,9 @@ CREATE TABLE notification_rules (
   CONSTRAINT notification_rules_ibfk_3 FOREIGN KEY (notification_template_id) REFERENCES notification_templates (id) ON DELETE CASCADE,
   CONSTRAINT notification_rules_lending_type_id_foreign FOREIGN KEY (lending_type_id) REFERENCES lending_types (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS notification_rules_drawdown_event_type_id_foreign;
 CREATE INDEX notification_rules_drawdown_event_type_id_foreign ON notification_rules (drawdown_event_type_id);
-DROP INDEX IF EXISTS notification_rules_file_id_foreign;
 CREATE INDEX notification_rules_file_id_foreign ON notification_rules (file_id);
-DROP INDEX IF EXISTS notification_rules_notification_template_id_foreign;
 CREATE INDEX notification_rules_notification_template_id_foreign ON notification_rules (notification_template_id);
-DROP INDEX IF EXISTS notification_rules_lending_type_id_foreign;
 CREATE INDEX notification_rules_lending_type_id_foreign ON notification_rules (lending_type_id);
 
 
@@ -3239,7 +3010,6 @@ CREATE TABLE notification_templates (
   PRIMARY KEY (id),
   CONSTRAINT notification_templates_ibfk_1 FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS notification_templates_file_id_foreign;
 CREATE INDEX notification_templates_file_id_foreign ON notification_templates (file_id);
 
 
@@ -3266,13 +3036,9 @@ CREATE TABLE orders (
   CONSTRAINT orders_ibfk_3 FOREIGN KEY (payment_id) REFERENCES payments (id),
   CONSTRAINT orders_ibfk_4 FOREIGN KEY (user_id) REFERENCES users (id)
 );
-DROP INDEX IF EXISTS orders_user_id_foreign;
 CREATE INDEX orders_user_id_foreign ON orders (user_id);
-DROP INDEX IF EXISTS orders_client_form_id_foreign;
 CREATE INDEX orders_client_form_id_foreign ON orders (client_form_id);
-DROP INDEX IF EXISTS orders_payment_id_foreign;
 CREATE INDEX orders_payment_id_foreign ON orders (payment_id);
-DROP INDEX IF EXISTS orders_order_status_id_foreign;
 CREATE INDEX orders_order_status_id_foreign ON orders (order_status_id);
 
 
@@ -3290,7 +3056,6 @@ CREATE TABLE quote_note (
   PRIMARY KEY (id),
   CONSTRAINT quote_note_ibfk_1 FOREIGN KEY (quote_id) REFERENCES quotes (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS quote_note_quote_id_foreign;
 CREATE INDEX quote_note_quote_id_foreign ON quote_note (quote_id);
 
 
@@ -3314,13 +3079,9 @@ CREATE TABLE quotes (
   CONSTRAINT quotes_ibfk_3 FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE CASCADE,
   CONSTRAINT quotes_ibfk_4 FOREIGN KEY (quotes_status_id) REFERENCES quotes_status (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS quotes_drawdown_profile_id_foreign;
 CREATE INDEX quotes_drawdown_profile_id_foreign ON quotes (drawdown_profile_id);
-DROP INDEX IF EXISTS quotes_quotes_status_id_foreign;
 CREATE INDEX quotes_quotes_status_id_foreign ON quotes (quotes_status_id);
-DROP INDEX IF EXISTS quotes_deal_id_foreign;
 CREATE INDEX quotes_deal_id_foreign ON quotes (deal_id);
-DROP INDEX IF EXISTS quotes_file_id_foreign;
 CREATE INDEX quotes_file_id_foreign ON quotes (file_id);
 
 
@@ -3346,15 +3107,10 @@ CREATE TABLE quotes_recipients (
   CONSTRAINT quotes_recipients_ibfk_1 FOREIGN KEY (client_individual_id) REFERENCES client_individuals (id) ON DELETE CASCADE,
   CONSTRAINT quotes_recipients_ibfk_2 FOREIGN KEY (quote_id) REFERENCES quotes (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS quotes_recipients_quote_id_foreign;
 CREATE INDEX quotes_recipients_quote_id_foreign ON quotes_recipients (quote_id);
-DROP INDEX IF EXISTS quotes_recipients_client_individual_id_foreign;
 CREATE INDEX quotes_recipients_client_individual_id_foreign ON quotes_recipients (client_individual_id);
-DROP INDEX IF EXISTS quotes_recipients_client_group_id_foreign;
 CREATE INDEX quotes_recipients_client_group_id_foreign ON quotes_recipients (client_group_id);
-DROP INDEX IF EXISTS quotes_recipients_client_company_id_foreign;
 CREATE INDEX quotes_recipients_client_company_id_foreign ON quotes_recipients (client_company_id);
-DROP INDEX IF EXISTS quotes_recipients_broker_agent_id_foreign;
 CREATE INDEX quotes_recipients_broker_agent_id_foreign ON quotes_recipients (broker_agent_id);
 
 
@@ -3381,11 +3137,8 @@ CREATE TABLE scheduled_notifications (
   CONSTRAINT scheduled_notifications_ibfk_2 FOREIGN KEY (drawdown_event_id) REFERENCES drawdown_events (id) ON DELETE CASCADE,
   CONSTRAINT scheduled_notifications_ibfk_3 FOREIGN KEY (enabled_by_user_id) REFERENCES users (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS scheduled_notifications_deal_notification_rule_id_foreign;
 CREATE INDEX scheduled_notifications_deal_notification_rule_id_foreign ON scheduled_notifications (deal_notification_rule_id);
-DROP INDEX IF EXISTS scheduled_notifications_enabled_by_user_id_foreign;
 CREATE INDEX scheduled_notifications_enabled_by_user_id_foreign ON scheduled_notifications (enabled_by_user_id);
-DROP INDEX IF EXISTS scheduled_notifications_drawdown_event_id_foreign;
 CREATE INDEX scheduled_notifications_drawdown_event_id_foreign ON scheduled_notifications (drawdown_event_id);
 
 
@@ -3425,17 +3178,11 @@ CREATE TABLE users (
   CONSTRAINT users_ibfk_4 FOREIGN KEY (payment_provider_id) REFERENCES payment_providers (id),
   CONSTRAINT users_ibfk_5 FOREIGN KEY (type_id) REFERENCES user_types (id)
 );
-DROP INDEX IF EXISTS users_stripe_id_index;
 CREATE INDEX users_stripe_id_index ON users (stripe_id);
-DROP INDEX IF EXISTS users_company_id_foreign;
 CREATE INDEX users_company_id_foreign ON users (company_id);
-DROP INDEX IF EXISTS users_type_id_foreign;
 CREATE INDEX users_type_id_foreign ON users (type_id);
-DROP INDEX IF EXISTS users_payment_provider_id_foreign;
 CREATE INDEX users_payment_provider_id_foreign ON users (payment_provider_id);
-DROP INDEX IF EXISTS users_avatar_id_foreign;
 CREATE INDEX users_avatar_id_foreign ON users (avatar_id);
-DROP INDEX IF EXISTS users_file_id_foreign;
 CREATE INDEX users_file_id_foreign ON users (file_id);
 
 
@@ -3469,19 +3216,12 @@ CREATE TABLE valuations (
   CONSTRAINT valuations_ibfk_6 FOREIGN KEY (service_provider_id) REFERENCES service_providers (id) ON DELETE CASCADE,
   CONSTRAINT valuations_ibfk_7 FOREIGN KEY (valuation_status_id) REFERENCES valuation_statuses (id) ON DELETE CASCADE
 );
-DROP INDEX IF EXISTS valuations_asset_id_foreign;
 CREATE INDEX valuations_asset_id_foreign ON valuations (asset_id);
-DROP INDEX IF EXISTS valuations_service_provider_id_foreign;
 CREATE INDEX valuations_service_provider_id_foreign ON valuations (service_provider_id);
-DROP INDEX IF EXISTS valuations_document_id_foreign;
 CREATE INDEX valuations_document_id_foreign ON valuations (document_id);
-DROP INDEX IF EXISTS valuations_currency_id_foreign;
 CREATE INDEX valuations_currency_id_foreign ON valuations (currency_id);
-DROP INDEX IF EXISTS valuations_fee_option_id_foreign;
 CREATE INDEX valuations_fee_option_id_foreign ON valuations (fee_option_id);
-DROP INDEX IF EXISTS valuations_valuation_status_id_foreign;
 CREATE INDEX valuations_valuation_status_id_foreign ON valuations (valuation_status_id);
-DROP INDEX IF EXISTS valuations_file_id_foreign;
 CREATE INDEX valuations_file_id_foreign ON valuations (file_id);
 
 COMMIT;
