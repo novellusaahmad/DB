@@ -90,3 +90,5 @@ These polymorphic tables eliminate the need for discrete join tables per domain 
 1. Define `morphMany`/`morphTo` relationships on each participating Eloquent model matching the `{column_base}_type`/`{column_base}_id` pairs from the schema.
 2. Use reference data (`reference_values`) to constrain permissible relationship, contact, or workflow types so that business rules remain declarative and centrally managed.【F:refactored_ddl.sql†L5-L44】
 3. Leverage the `metadata` JSON columns for infrequently used attributes that existed in the legacy schema without introducing new tables, preserving flexibility while keeping the table count low.
+
+For concrete examples of the `{type, id}` payloads seeded during migrations, see the "Sample polymorphic payloads" section inside [`refactored_ddl_mapping.md`](refactored_ddl_mapping.md).【F:refactored_ddl_mapping.md†L107-L214】
