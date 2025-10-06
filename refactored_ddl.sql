@@ -240,7 +240,7 @@ CREATE TABLE relationship_links (
   amount_value            numeric(22,2),
   ratio_value             numeric(9,4),
   start_date              date,
-  end_date                date
+  end_date                date,
   started_at              timestamp without time zone,
   ended_at                timestamp without time zone,
   UNIQUE(left_type, left_id, right_type, right_id, relationship_type_id, COALESCE(context_type, ''), COALESCE(context_id, 0))
