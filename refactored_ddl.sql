@@ -8,7 +8,6 @@ CREATE TABLE activity_logs (
   event          varchar(255),
   causer_type    varchar(128),
   causer_id      bigint,
-  properties     jsonb DEFAULT '{}'::jsonb,
   batch_uuid     char(36),
   created_at     timestamp without time zone DEFAULT now(),
   updated_at     timestamp without time zone DEFAULT now(),
@@ -36,7 +35,6 @@ CREATE TABLE reference_values (
   description      text,
   display_order    integer DEFAULT 0,
   is_active        boolean DEFAULT true,
-  metadata         jsonb DEFAULT '{}'::jsonb,
   UNIQUE(domain_id, code)
 );
 
@@ -59,7 +57,6 @@ CREATE TABLE entities (
   phone_number          varchar(64),
   mobile_number         varchar(64),
   status_value_id       bigint REFERENCES reference_values(id),
-  metadata              jsonb DEFAULT '{}'::jsonb,
   created_at            timestamp without time zone DEFAULT now(),
   updated_at            timestamp without time zone DEFAULT now(),
   deleted_at            timestamp without time zone
@@ -89,7 +86,6 @@ CREATE TABLE contact_points (
   is_primary         boolean DEFAULT false,
   is_verified        boolean DEFAULT false,
   verified_at        timestamp without time zone,
-  metadata           jsonb DEFAULT '{}'::jsonb,
   created_at         timestamp without time zone DEFAULT now(),
   updated_at         timestamp without time zone DEFAULT now(),
   UNIQUE(contactable_type, contactable_id, contact_type_id, contact_value)
@@ -112,7 +108,6 @@ CREATE TABLE postal_addresses (
   country_code   varchar(2) NOT NULL,
   latitude       numeric(10,7),
   longitude      numeric(10,7),
-  metadata       jsonb DEFAULT '{}'::jsonb,
   created_at     timestamp without time zone DEFAULT now(),
   updated_at     timestamp without time zone DEFAULT now()
 );
@@ -126,7 +121,6 @@ CREATE TABLE address_links (
   is_primary         boolean DEFAULT false,
   valid_from         date,
   valid_to           date,
-  metadata           jsonb DEFAULT '{}'::jsonb,
   created_at         timestamp without time zone DEFAULT now(),
   updated_at         timestamp without time zone DEFAULT now(),
   UNIQUE(addressable_type, addressable_id, usage_type_id, address_id)
@@ -145,7 +139,6 @@ CREATE TABLE financial_accounts (
   bic                varchar(11),
   sort_code          varchar(16),
   currency_code      varchar(3),
-  metadata           jsonb DEFAULT '{}'::jsonb,
   valid_from         date,
   valid_to           date,
   created_at         timestamp without time zone DEFAULT now(),
@@ -163,7 +156,6 @@ CREATE TABLE attribute_definitions (
   data_type          varchar(32) NOT NULL,
   default_value      text,
   is_required        boolean DEFAULT false,
-  metadata           jsonb DEFAULT '{}'::jsonb,
   UNIQUE(domain_id, code)
 );
 
@@ -175,7 +167,7 @@ CREATE TABLE attribute_assignments (
   value_text        text,
   value_number      numeric(22,8),
   value_date        date,
-  value_json        jsonb,
+  value_boolean     boolean,
   valid_from        timestamp without time zone,
   valid_to          timestamp without time zone,
   created_at        timestamp without time zone DEFAULT now(),
@@ -193,7 +185,6 @@ CREATE TABLE assets (
   primary_address_id    bigint REFERENCES postal_addresses(id),
   acquisition_date      date,
   disposal_date         date,
-  metadata              jsonb DEFAULT '{}'::jsonb,
   created_at            timestamp without time zone DEFAULT now(),
   updated_at            timestamp without time zone DEFAULT now()
 );
@@ -212,10 +203,9 @@ CREATE TABLE relationship_links (
   amount_value            numeric(22,2),
   ratio_value             numeric(9,4),
   start_date              date,
-  end_date                date,
+  end_date                date
   started_at              timestamp without time zone,
   ended_at                timestamp without time zone,
-  metadata                jsonb DEFAULT '{}'::jsonb,
   UNIQUE(left_type, left_id, right_type, right_id, relationship_type_id, COALESCE(context_type, ''), COALESCE(context_id, 0))
 );
 
@@ -231,8 +221,7 @@ CREATE TABLE asset_coverages (
   coverage_amount         numeric(22,2),
   premium_amount          numeric(22,2),
   start_date              date,
-  end_date                date,
-  metadata                jsonb DEFAULT '{}'::jsonb
+  end_date                date
 );
 
 CREATE TABLE asset_metrics (
@@ -243,8 +232,7 @@ CREATE TABLE asset_metrics (
   metric_value_text   text,
   metric_value_date   date,
   source_reference    varchar(255),
-  effective_date      date NOT NULL,
-  metadata            jsonb DEFAULT '{}'::jsonb
+  effective_date      date NOT NULL
 );
 
 CREATE TABLE deals (
@@ -256,8 +244,7 @@ CREATE TABLE deals (
   originating_entity_id   bigint REFERENCES entities(id),
   created_at              timestamp without time zone DEFAULT now(),
   updated_at              timestamp without time zone DEFAULT now(),
-  closed_at               timestamp without time zone,
-  metadata                jsonb DEFAULT '{}'::jsonb
+  closed_at               timestamp without time zone
 );
 
 CREATE TABLE deal_versions (
@@ -280,7 +267,9 @@ CREATE TABLE deal_terms (
   amount               numeric(22,2),
   percentage           numeric(9,4),
   rate                 numeric(9,4),
-  term_json            jsonb,
+  term_value_text      text,
+  term_value_number    numeric(22,6),
+  term_value_date      date,
   effective_date       date NOT NULL,
   expiry_date          date,
   created_at           timestamp without time zone DEFAULT now()
@@ -290,7 +279,10 @@ CREATE TABLE deal_settings (
   id                     bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
   deal_id                bigint NOT NULL REFERENCES deals(id),
   setting_type_id        bigint NOT NULL REFERENCES reference_values(id),
-  value_json             jsonb NOT NULL,
+  value_text             text,
+  value_number           numeric(22,6),
+  value_boolean          boolean,
+  value_date             date,
   inherited_from_id      bigint REFERENCES deal_settings(id),
   created_at             timestamp without time zone DEFAULT now(),
   updated_at             timestamp without time zone DEFAULT now(),
@@ -317,7 +309,6 @@ CREATE TABLE workflow_steps (
   step_type_id            bigint NOT NULL REFERENCES reference_values(id),
   assignee_role_id        bigint REFERENCES reference_values(id),
   due_in_days             integer,
-  metadata                jsonb DEFAULT '{}'::jsonb,
   UNIQUE(definition_id, step_number)
 );
 
@@ -328,8 +319,7 @@ CREATE TABLE workflow_instances (
   subject_id           bigint,
   status_value_id      bigint NOT NULL REFERENCES reference_values(id),
   started_at           timestamp without time zone DEFAULT now(),
-  completed_at         timestamp without time zone,
-  metadata             jsonb DEFAULT '{}'::jsonb
+  completed_at         timestamp without time zone
 );
 
 CREATE INDEX workflow_instances_subject_idx ON workflow_instances (subject_type, subject_id);
@@ -341,8 +331,7 @@ CREATE TABLE workflow_events (
   event_type_id           bigint NOT NULL REFERENCES reference_values(id),
   performed_by_entity_id  bigint REFERENCES entities(id),
   event_at                timestamp without time zone DEFAULT now(),
-  notes                   text,
-  metadata                jsonb DEFAULT '{}'::jsonb
+  notes                   text
 );
 
 CREATE TABLE documents (
@@ -353,8 +342,7 @@ CREATE TABLE documents (
   originating_entity_id    bigint REFERENCES entities(id),
   uploaded_by_entity_id    bigint REFERENCES entities(id),
   uploaded_at              timestamp without time zone DEFAULT now(),
-  file_id                  bigint NOT NULL,
-  metadata                 jsonb DEFAULT '{}'::jsonb
+  file_id                  bigint NOT NULL
 );
 
 CREATE TABLE files (
@@ -411,7 +399,6 @@ CREATE TABLE notification_templates (
   subject              varchar(255),
   body                 text NOT NULL,
   default_sender       varchar(255),
-  metadata             jsonb DEFAULT '{}'::jsonb,
   created_at           timestamp without time zone DEFAULT now(),
   updated_at           timestamp without time zone DEFAULT now()
 );
@@ -420,7 +407,9 @@ CREATE TABLE notifications (
   id                         bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
   template_id                bigint REFERENCES notification_templates(id),
   triggering_event_type_id   bigint REFERENCES reference_values(id),
-  payload_json               jsonb,
+  context_reference_type     varchar(128),
+  context_reference_id       bigint,
+  context_summary            text,
   sent_by_entity_id          bigint REFERENCES entities(id),
   status_value_id            bigint REFERENCES reference_values(id),
   scheduled_at               timestamp without time zone,
@@ -438,7 +427,8 @@ CREATE TABLE notification_targets (
   delivery_status_id      bigint REFERENCES reference_values(id),
   delivery_reference      varchar(255),
   sent_at                 timestamp without time zone,
-  response_payload        jsonb
+  response_code           varchar(64),
+  response_message        text
 );
 
 CREATE INDEX notification_targets_target_idx ON notification_targets (target_type, target_id);
@@ -455,7 +445,6 @@ CREATE TABLE financial_transactions (
   transaction_date            date NOT NULL,
   status_value_id             bigint REFERENCES reference_values(id),
   external_reference          varchar(255),
-  metadata                    jsonb DEFAULT '{}'::jsonb,
   created_at                  timestamp without time zone DEFAULT now()
 );
 
@@ -467,8 +456,7 @@ CREATE TABLE financial_allocations (
   allocation_type_id          bigint NOT NULL REFERENCES reference_values(id),
   amount                      numeric(22,2) NOT NULL,
   reference_type              varchar(64),
-  reference_id                bigint,
-  metadata                    jsonb DEFAULT '{}'::jsonb
+  reference_id                bigint
 );
 
 CREATE TABLE transaction_attempts (
@@ -478,7 +466,8 @@ CREATE TABLE transaction_attempts (
   attempted_at                timestamp without time zone DEFAULT now(),
   channel_type_id             bigint REFERENCES reference_values(id),
   status_value_id             bigint REFERENCES reference_values(id),
-  response_payload            jsonb,
+  response_code               varchar(64),
+  response_message            text,
   error_message               text,
   UNIQUE(transaction_id, attempt_number)
 );
@@ -493,16 +482,17 @@ CREATE TABLE pricing_schedules (
   ceiling_rate                numeric(9,4),
   effective_date              date NOT NULL,
   expiry_date                 date,
-  source_reference            varchar(255),
-  metadata                    jsonb DEFAULT '{}'::jsonb
+  source_reference            varchar(255)
 );
 
 CREATE TABLE pricing_history (
   id                          bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
   schedule_id                 bigint NOT NULL REFERENCES pricing_schedules(id),
   change_type_id              bigint REFERENCES reference_values(id),
-  old_value_json              jsonb,
-  new_value_json              jsonb,
+  old_value_number            numeric(22,6),
+  old_value_text              text,
+  new_value_number            numeric(22,6),
+  new_value_text              text,
   changed_at                  timestamp without time zone DEFAULT now(),
   changed_by_entity_id        bigint REFERENCES entities(id)
 );
@@ -515,8 +505,7 @@ CREATE TABLE drawdowns (
   currency_code           varchar(3) NOT NULL,
   status_value_id         bigint REFERENCES reference_values(id),
   requested_at            timestamp without time zone DEFAULT now(),
-  approved_at             timestamp without time zone,
-  metadata                jsonb DEFAULT '{}'::jsonb
+  approved_at             timestamp without time zone
 );
 
 CREATE TABLE drawdown_events (
@@ -526,7 +515,8 @@ CREATE TABLE drawdown_events (
   status_value_id         bigint REFERENCES reference_values(id),
   occurred_at             timestamp without time zone NOT NULL,
   recorded_by_entity_id   bigint REFERENCES entities(id),
-  payload_json            jsonb
+  event_notes             text,
+  reference_number        varchar(255)
 );
 
 CREATE TABLE drawdown_checks (
@@ -548,7 +538,6 @@ CREATE TABLE quotes (
   valid_to                    date,
   total_amount                numeric(22,2),
   currency_code               varchar(3) NOT NULL,
-  metadata                    jsonb DEFAULT '{}'::jsonb,
   created_at                  timestamp without time zone DEFAULT now()
 );
 
@@ -571,8 +560,7 @@ CREATE TABLE sales_orders (
   deal_id                     bigint REFERENCES deals(id),
   order_status_id             bigint REFERENCES reference_values(id),
   placed_at                   timestamp without time zone DEFAULT now(),
-  fulfilled_at                timestamp without time zone,
-  metadata                    jsonb DEFAULT '{}'::jsonb
+  fulfilled_at                timestamp without time zone
 );
 
 CREATE TABLE forms (
@@ -581,7 +569,8 @@ CREATE TABLE forms (
   name                    varchar(255) NOT NULL,
   version                 integer NOT NULL,
   status_value_id         bigint REFERENCES reference_values(id),
-  schema_json             jsonb NOT NULL,
+  introduction            text,
+  confirmation_statement  text,
   created_by_entity_id    bigint REFERENCES entities(id),
   created_at              timestamp without time zone DEFAULT now(),
   updated_at              timestamp without time zone DEFAULT now(),
@@ -596,8 +585,7 @@ CREATE TABLE form_responses (
   subject_id              bigint,
   status_value_id         bigint REFERENCES reference_values(id),
   submitted_at            timestamp without time zone,
-  response_json           jsonb,
-  metadata                jsonb DEFAULT '{}'::jsonb
+  overall_comment         text
 );
 
 CREATE INDEX form_responses_subject_idx ON form_responses (subject_type, subject_id);
@@ -609,6 +597,54 @@ CREATE TABLE form_documents (
   UNIQUE(form_response_id, document_id)
 );
 
+CREATE TABLE form_sections (
+  id                      bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  form_id                 bigint NOT NULL REFERENCES forms(id),
+  section_number          integer NOT NULL,
+  title                   varchar(255),
+  description             text,
+  UNIQUE(form_id, section_number)
+);
+
+CREATE TABLE form_questions (
+  id                      bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  section_id              bigint REFERENCES form_sections(id),
+  form_id                 bigint NOT NULL REFERENCES forms(id),
+  question_number         integer NOT NULL,
+  prompt                  text NOT NULL,
+  response_type_id        bigint NOT NULL REFERENCES reference_values(id),
+  is_required             boolean DEFAULT false,
+  help_text               text,
+  default_text            text,
+  default_number          numeric(22,6),
+  default_date            date,
+  default_boolean         boolean,
+  UNIQUE(form_id, question_number)
+);
+
+CREATE TABLE form_question_options (
+  id                      bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  question_id             bigint NOT NULL REFERENCES form_questions(id),
+  option_code             varchar(64) NOT NULL,
+  option_label            varchar(255) NOT NULL,
+  display_order           integer DEFAULT 0,
+  is_active               boolean DEFAULT true,
+  UNIQUE(question_id, option_code)
+);
+
+CREATE TABLE form_response_answers (
+  id                      bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  response_id             bigint NOT NULL REFERENCES form_responses(id),
+  question_id             bigint NOT NULL REFERENCES form_questions(id),
+  answer_text             text,
+  answer_number           numeric(22,6),
+  answer_date             date,
+  answer_boolean          boolean,
+  selected_option_code    varchar(64),
+  answered_at             timestamp without time zone DEFAULT now(),
+  UNIQUE(response_id, question_id)
+);
+
 CREATE TABLE valuations (
   id                      bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
   valuable_type           varchar(128) NOT NULL,
@@ -617,7 +653,6 @@ CREATE TABLE valuations (
   valuation_amount        numeric(22,2) NOT NULL,
   valuation_date          date NOT NULL,
   source_reference        varchar(255),
-  metadata                jsonb DEFAULT '{}'::jsonb,
   created_at              timestamp without time zone DEFAULT now()
 );
 
@@ -626,7 +661,9 @@ CREATE INDEX valuations_valuable_idx ON valuations (valuable_type, valuable_id);
 CREATE TABLE system_jobs (
   id                      bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
   job_key                 varchar(255) NOT NULL,
-  payload_json            jsonb NOT NULL,
+  arguments_text          text,
+  related_record_type     varchar(128),
+  related_record_id       bigint,
   status_value_id         bigint REFERENCES reference_values(id),
   available_at            timestamp without time zone,
   attempts                integer DEFAULT 0,
@@ -642,15 +679,30 @@ CREATE TABLE audit_events (
   scope_id                bigint,
   event_type_id           bigint REFERENCES reference_values(id),
   event_at                timestamp without time zone DEFAULT now(),
-  changes_json            jsonb,
   ip_address              varchar(64),
   user_agent              varchar(255)
+);
+
+CREATE TABLE audit_event_changes (
+  id                      bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  audit_event_id          bigint NOT NULL REFERENCES audit_events(id),
+  changed_table           varchar(128) NOT NULL,
+  changed_column          varchar(128) NOT NULL,
+  old_value_text          text,
+  old_value_number        numeric(22,6),
+  old_value_boolean       boolean,
+  new_value_text          text,
+  new_value_number        numeric(22,6),
+  new_value_boolean       boolean
 );
 
 CREATE TABLE integration_settings (
   id                      bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
   integration_type_id     bigint NOT NULL REFERENCES reference_values(id),
-  configuration_json      jsonb NOT NULL,
+  endpoint_url            varchar(512),
+  account_identifier      varchar(255),
+  api_key_reference       varchar(255),
+  secret_reference        varchar(255),
   is_active               boolean DEFAULT true,
   created_at              timestamp without time zone DEFAULT now(),
   updated_at              timestamp without time zone DEFAULT now(),
@@ -662,7 +714,10 @@ CREATE TABLE system_settings (
   setting_key             varchar(255) NOT NULL,
   scope_type              varchar(64),
   scope_id                bigint,
-  value_json              jsonb NOT NULL,
+  value_text              text,
+  value_number            numeric(22,6),
+  value_boolean           boolean,
+  value_date              date,
   created_at              timestamp without time zone DEFAULT now(),
   updated_at              timestamp without time zone DEFAULT now(),
   UNIQUE(setting_key, COALESCE(scope_type, ''), COALESCE(scope_id, 0))
