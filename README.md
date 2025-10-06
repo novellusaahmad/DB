@@ -97,7 +97,17 @@ python3 tests/test_sql_files.py ddl.sql refactored_ddl.sql
 
 # Execute the DDL against a Postgres instance
 python3 tests/test_sql_files.py ddl.sql refactored_ddl.sql --execute --database-url postgresql://user:pass@localhost/postgres
+
+# Smoke test the DDL inside disposable schemas (requires psql)
+python3 tests/run_ddl_files.py postgresql://user:pass@localhost/postgres ddl.sql refactored_ddl.sql
 ```
+
+`tests/run_ddl_files.py` wraps each SQL file in a temporary schema, executes it
+through `psql`, and then drops the schema again. This ensures the scripts are
+transactionally sound and can be executed end-to-end without altering existing
+objects in the target database. Pass `--keep-schema` if you would like to
+inspect the created tables after the run, or `--schema` to override the base
+schema name that is generated for each file.
 
 ### Mapping flow script
 
