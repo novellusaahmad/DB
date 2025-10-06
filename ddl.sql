@@ -1359,7 +1359,7 @@ CREATE TABLE variable_rates_history_copy1 (
   PRIMARY KEY (id),
   CONSTRAINT variable_rates_history_copy1_ibfk_1 FOREIGN KEY (variable_rate_source_id) REFERENCES variable_rate_sources (id) ON DELETE CASCADE
 );
-CREATE INDEX variable_rates_history_variable_rate_source_id_foreign ON variable_rates_history_copy1 (variable_rate_source_id);
+CREATE INDEX variable_rates_history_copy1_variable_rate_source_id_foreign ON variable_rates_history_copy1 (variable_rate_source_id);
 
 
 -- prod.lender_funder_interest_rate definition

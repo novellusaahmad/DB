@@ -87,6 +87,18 @@ python data_migration.py \
 
 Use the plan output as a checklist: the script only moves data for columns with an unambiguous destination, leaving relationship fan-out and attribute reshaping to domain-specific ETL jobs.
 
+### Validating the DDL snapshots
+
+Run `tests/test_sql_files.py` to lint the SQL snapshots for duplicate object names and, when a PostgreSQL client is available, to execute the files inside a temporary transaction. The validator defaults to static analysis, which is useful in constrained CI environments that may not ship with `psql`.
+
+```bash
+# Static validation (checks for duplicate tables, indexes, and constraints)
+python3 tests/test_sql_files.py ddl.sql refactored_ddl.sql
+
+# Execute the DDL against a Postgres instance
+python3 tests/test_sql_files.py ddl.sql refactored_ddl.sql --execute --database-url postgresql://user:pass@localhost/postgres
+```
+
 ### Mapping flow script
 
 Run `./refactored_ddl.sh` to print an end-to-end mapping flow that walks each legacy table to its destination inside the refactored schema. The script mirrors the table above, but it also highlights when polymorphic join tables (`relationship_links`, `note_links`, etc.) absorb responsibilities that were previously handled by bespoke pivot tables. Because the mapping is generated programmatically, you can feed the output into documentation or migration tooling without reformatting by hand. See [`refactored_ddl_mapping.md`](refactored_ddl_mapping.md) for a narrative walkthrough of the script's output structure and usage tips.【F:refactored_ddl.sh†L1-L172】【F:refactored_ddl_mapping.md†L1-L46】
