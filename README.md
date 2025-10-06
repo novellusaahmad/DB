@@ -3,14 +3,14 @@
 This repository now carries two snapshots of the platform database design:
 
 - `ddl.sql` – the 149-table legacy schema captured from production.
-- `refactored_ddl.sql` – a consolidated design that expresses the same functional surface area with 52 reusable base tables.
+- `refactored_ddl.sql` – a consolidated design that expresses the same functional surface area with 50 reusable base tables.
 
 ## Reduction highlights
 
-- **65% fewer base tables.** By collapsing 149 legacy tables into 52 shared structures, the refactored design removes duplicated entity, lookup, and workflow tables while preserving functionality.【F:ddl.sql†L1-L2891】【F:refactored_ddl.sql†L1-L528】
+- **66% fewer base tables.** By collapsing 149 legacy tables into 50 shared structures, the refactored design removes duplicated entity, lookup, and workflow tables while preserving functionality.【F:ddl.sql†L1-L2891】【F:refactored_ddl.sql†L1-L528】
 - **Unified reference data.** All status/type enumerations now live in `reference_domains` and `reference_values`, replacing dozens of bespoke lookup tables.【F:refactored_ddl.sql†L5-L44】
-- **Reusable entity model.** People, companies, administrators, brokers, lenders, and guarantors are represented through a single `entities` table with shared contact, credential, address, and relationship tables.【F:refactored_ddl.sql†L46-L159】【F:refactored_ddl.sql†L233-L246】
-- **Streamlined workflows and finance.** Deals, tasks, drawdowns, pricing, quotes, notifications, documents, and payments leverage cohesive subsystems instead of isolated schemas.【F:refactored_ddl.sql†L161-L528】
+- **Reusable entity model.** People, companies, administrators, brokers, lenders, and guarantors are represented through a single `entities` table with shared contact, credential, address, and relationship tables.【F:refactored_ddl.sql†L46-L159】【F:refactored_ddl.sql†L200-L246】
+- **Streamlined workflows and finance.** Deals, tasks, drawdowns, pricing, quotes, notifications, documents, and payments leverage cohesive subsystems instead of isolated schemas.【F:refactored_ddl.sql†L248-L528】
 
 ## How legacy tables map to the new structures
 
@@ -35,3 +35,30 @@ The table below references every table defined in `ddl.sql`, grouping them by ca
 | Shared Notes & Commentary | `notes` | `notes`<br>`note_links` | Centralises free-text commentary with polymorphic links instead of multiple specialised note tables. |
 
 Total legacy tables covered: **149**.
+
+## Working with polymorphic relationships
+
+Laravel's morph relationships map cleanly onto the consolidated tables through shared `{name}_type` and `{name}_id` columns. The following subsections outline the primary polymorphic tables and how they should be used inside the application layer.
+
+### Core party data
+
+- **`contact_points`** – Store emails, phones, and other communication details for any entity (`Entity::morphMany('contactable')`) or domain object that needs to surface contact data. Each record captures the reference value for its contact type, verification state, and optional metadata for channel-specific settings.【F:refactored_ddl.sql†L71-L96】
+- **`address_links`** – Associate one or more `postal_addresses` to any model (`morphMany('addressable')`) while tracking usage (billing, service, collateral) and validity windows. This replaces the collection of bespoke join tables found in the legacy schema.【F:refactored_ddl.sql†L109-L140】
+- **`financial_accounts`** – Attach bank or settlement instructions to any owning record via `morphMany('accountable')`, capturing account type, identifiers, and lifecycle dates for compliance and audit needs.【F:refactored_ddl.sql†L142-L165】
+
+### Cross-record relationships and metadata
+
+- **`relationship_links`** – General-purpose join table for relating any two records (e.g., entities to deals, entities to assets) using `morphTo` pairings for the `left` and `right` sides. Store the reference-valued relationship type, optional roles, contextual target (deal version, asset, workflow step), state transitions, and financial exposure so the same structure powers introducers, guarantors, or asset pledges.【F:refactored_ddl.sql†L200-L223】
+- **`attribute_assignments`** – Extend any model with typed custom fields via `morphMany('owner')`. The table supports text, numeric, date, and JSON values as well as effective dating for regulatory history tracking.【F:refactored_ddl.sql†L169-L198】
+- **`note_links`, `document_links`, `notification_targets`, and `form_documents`** – Each link table carries `{target}_type` and `{target}_id` columns so shared content stores (notes, documents, notifications, forms) can be attached to deals, assets, entities, or workflow instances without additional join tables. Within Laravel, expose these through `morphMany`/`morphToMany` relationships to centralise collaboration data.【F:refactored_ddl.sql†L324-L528】
+
+### Activity and workflow tracking
+
+- **`activity_logs`** – Implements a polymorphic audit trail using `subject_type/subject_id` and `causer_type/causer_id` pairs. This aligns with Laravel's Spatie Activitylog package, allowing the application to record lifecycle events against any morphable record while retaining the original audit attributes from the legacy system.【F:refactored_ddl.sql†L1-L20】
+- **`workflow_instances`**, **`workflow_events`**, and **`notifications`** – Workflow executions link back to their governing deals, tasks, or assets via morph columns. Notifications reuse the same approach to deliver alerts to entities, roles, or external targets, reducing schema sprawl while keeping every historical reference reachable from Laravel models.【F:refactored_ddl.sql†L248-L528】
+
+These polymorphic tables eliminate the need for discrete join tables per domain concept. When modelling in Laravel:
+
+1. Define `morphMany`/`morphTo` relationships on each participating Eloquent model matching the `{column_base}_type`/`{column_base}_id` pairs from the schema.
+2. Use reference data (`reference_values`) to constrain permissible relationship, contact, or workflow types so that business rules remain declarative and centrally managed.【F:refactored_ddl.sql†L5-L44】
+3. Leverage the `metadata` JSON columns for infrequently used attributes that existed in the legacy schema without introducing new tables, preserving flexibility while keeping the table count low.
