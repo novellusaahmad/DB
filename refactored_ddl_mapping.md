@@ -47,6 +47,14 @@ The table below illustrates how to read the mapping by walking through frequentl
 
 The matrix below extends the narrative with concrete column pairings so data engineers can script migrations without reverse engineering the schema. Each row surfaces a commonly migrated attribute, its landing zone, and the conventions used when shape or semantics shift during the refactor.
 
+To satisfy requests for full coverage, the repository now ships with a generated companion file—[`refactored_column_mapping.md`](./refactored_column_mapping.md)—that enumerates **every** column declared in `ddl.sql`, the refactored structure that receives it, and guidance for handling polymorphic or metadata-driven moves. Regenerate the report after schema edits with:
+
+```bash
+python generate_column_mapping.py
+```
+
+The high-level examples below illustrate how to interpret the comprehensive matrix.
+
 | Legacy table | Legacy column | Refactored table | Refactored column(s) | Notes |
 | --- | --- | --- | --- | --- |
 | `asset_addresses` | `postcode`, `county`, `city`, `district`, `street`, `house_number` | `postal_addresses` | `postcode`, `county`, `city`, `district`, `street`, `house_number` | Core location fields lift-and-shift into the consolidated address catalog; `country` is normalized into `postal_addresses.country_code` using ISO values during migration.【F:ddl.sql†L44-L55】【F:refactored_ddl.sql†L100-L118】 |
