@@ -40,6 +40,7 @@ REPO_ROOT = Path(__file__).resolve().parent
 DEFAULT_LEGACY_DDL = REPO_ROOT / "ddl.sql"
 DEFAULT_REFACTORED_DDL = REPO_ROOT / "refactored_ddl.sql"
 DEFAULT_MAPPING_SCRIPT = REPO_ROOT / "refactored_ddl.sh"
+DEFAULT_COLUMN_MAPPING = REPO_ROOT / "refactored_column_mapping.md"
 
 
 def parse_tables_from_ddl(path: Path) -> Dict[str, List[str]]:
@@ -125,6 +126,41 @@ def parse_mapping_from_script(path: Path) -> Dict[str, List[str]]:
     return mapping
 
 
+def parse_column_mapping(path: Path) -> Dict[Tuple[str, str], Tuple[List[str], str]]:
+    """Read the Markdown table that captures the curated column mapping."""
+
+    column_mapping: Dict[Tuple[str, str], Tuple[List[str], str]] = {}
+    if not path.exists():
+        return column_mapping
+
+    for raw_line in path.read_text().splitlines():
+        line = raw_line.strip()
+        if not line.startswith("| `"):
+            continue
+
+        cells = [cell.strip() for cell in line.split("|")]
+        if len(cells) < 5:
+            continue
+
+        legacy_table = cells[1].strip("` ")
+        legacy_column = cells[2].strip("` ")
+        target_cell = cells[3]
+        guidance = cells[4]
+
+        targets: List[str] = []
+        for chunk in target_cell.split(","):
+            cleaned = chunk.strip()
+            if not cleaned:
+                continue
+            cleaned = cleaned.split(" (", 1)[0]
+            cleaned = cleaned.replace("`", "")
+            targets.append(cleaned)
+
+        column_mapping[(legacy_table, legacy_column)] = (targets, guidance)
+
+    return column_mapping
+
+
 @dataclass
 class MappingResult:
     direct_targets: List[str]
@@ -172,10 +208,12 @@ class MappingResolver:
         legacy_tables: Dict[str, List[str]],
         refactored_tables: Dict[str, List[str]],
         legacy_to_targets: Dict[str, List[str]],
+        column_mapping: Dict[Tuple[str, str], Tuple[List[str], str]] | None = None,
     ) -> None:
         self.legacy_tables = legacy_tables
         self.refactored_tables = refactored_tables
         self.legacy_to_targets = legacy_to_targets
+        self.column_mapping = column_mapping or {}
         self.notes_hint: Dict[str, str] = {
             "relationship_links": "Polymorphic join row. Populate left/right identifiers according to the relationship semantics described in refactored_ddl.sh.",
             "note_links": "Polymorphic note attachment. Use notable_type/notable_id with curated role references.",
@@ -204,6 +242,19 @@ class MappingResolver:
         }
 
     def resolve(self, legacy_table: str, column: str) -> MappingResult:
+        explicit = self.column_mapping.get((legacy_table, column))
+        if explicit:
+            targets, guidance = explicit
+            direct_hits = [target for target in targets if "." in target]
+            fallback = ""
+            for target in targets:
+                if "." not in target:
+                    fallback = target
+                    break
+            if not fallback and targets:
+                fallback = targets[0]
+            return MappingResult(direct_targets=direct_hits, fallback_target=fallback, guidance=guidance)
+
         targets = self.legacy_to_targets.get(legacy_table, [])
         direct_hits: List[str] = []
 
@@ -298,6 +349,7 @@ class MigrationPlanner:
         legacy_ddl: Path = DEFAULT_LEGACY_DDL,
         refactored_ddl: Path = DEFAULT_REFACTORED_DDL,
         mapping_script: Path = DEFAULT_MAPPING_SCRIPT,
+        column_mapping: Path = DEFAULT_COLUMN_MAPPING,
     ) -> None:
         if not legacy_ddl.exists() or not refactored_ddl.exists() or not mapping_script.exists():
             raise FileNotFoundError("One or more schema artifacts are missing. Ensure ddl.sql, refactored_ddl.sql, and refactored_ddl.sh are present.")
@@ -305,8 +357,9 @@ class MigrationPlanner:
         self.legacy_tables = parse_tables_from_ddl(legacy_ddl)
         self.refactored_tables = parse_tables_from_ddl(refactored_ddl)
         self.legacy_to_targets = parse_mapping_from_script(mapping_script)
+        self.column_mapping = parse_column_mapping(column_mapping)
         self.resolver = MappingResolver(
-            self.legacy_tables, self.refactored_tables, self.legacy_to_targets
+            self.legacy_tables, self.refactored_tables, self.legacy_to_targets, self.column_mapping
         )
 
     def build_plan(self) -> List[TablePlan]:
@@ -554,6 +607,12 @@ def parse_args() -> argparse.Namespace:
         help="Path to refactored_ddl.sh for table-level mapping hints.",
     )
     parser.add_argument(
+        "--column-mapping",
+        type=Path,
+        default=DEFAULT_COLUMN_MAPPING,
+        help="Path to refactored_column_mapping.md for curated column guidance.",
+    )
+    parser.add_argument(
         "--plan-output",
         type=Path,
         help="Optional path to dump the full migration plan as JSON.",
@@ -603,6 +662,7 @@ def main() -> None:
         legacy_ddl=args.legacy_ddl,
         refactored_ddl=args.refactored_ddl,
         mapping_script=args.mapping_script,
+        column_mapping=args.column_mapping,
     )
     plans = planner.build_plan()
 
