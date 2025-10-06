@@ -74,29 +74,29 @@ legacy_to_targets = parse_mapping_from_script(MAPPING_SCRIPT)
 
 notes_hint = {
     "relationship_links": "Polymorphic join row. Use left/right identifiers according to the relationship semantics documented in refactored_ddl.sh.",
-    "note_links": "Polymorphic note attachment. Use notable_type/notable_id with supporting metadata.",
+    "note_links": "Polymorphic note attachment. Use notable_type/notable_id with curated role references.",
     "notes": "Centralized note body storage. Preserve note authorship and timestamps.",
-    "financial_accounts": "Standardized financial account schema; unmatched fields may reside in metadata JSON.",
+    "financial_accounts": "Standardized financial account schema; use attribute assignments for any institution-specific extensions.",
     "postal_addresses": "Normalized address catalog shared via address_links.",
     "address_links": "Associative link between owner and postal address. Use addressable_type/addressable_id for polymorphism.",
     "contact_points": "Polymorphic contact info with contactable_type/contactable_id context.",
-    "attribute_assignments": "Key-value attribute framework storing dynamic fields.",
+    "attribute_assignments": "Reusable attribute fabric that captures governed extensions by data type.",
     "reference_values": "Domain-driven lookup entry stored via shared reference framework.",
     "reference_domains": "Reference domain catalog; columns unchanged.",
-    "audit_events": "Audit timeline. Map actor/scope identifiers and persist payload-specific fields inside changes_json.",
-    "system_jobs": "Asynchronous job queue. Serialize legacy payloads into job_json and scheduling columns.",
-    "system_settings": "Configuration registry. Move key/value data into setting_key and value_json, scoping via scope_type/scope_id.",
-    "integration_settings": "Integration configuration. Normalize provider-specific data into configuration_json with activation flags.",
-    "entities": "Canonical party/person/company row. Preserve profile attributes or offload extras to metadata/attribute frameworks.",
-    "entity_credentials": "Authentication credentials. Align identifiers with entity_id and credential fields; use metadata for provider details.",
-    "workflow_events": "Workflow audit trail. Map timestamps and actor references into normalized event fields and metadata JSON.",
-    "workflow_definitions": "Workflow definition catalog. Persist legacy configuration inside definition_json or metadata structures.",
-    "workflow_steps": "Ordered workflow stages. Use step order, automation flags, and metadata JSON for dynamic behavior.",
-    "deal_terms": "Deal economics. Normalize numeric thresholds and timing values into standardized columns; extra levers live in metadata.",
-    "document_links": "Document attachment join. Map owning model via documentable_type/documentable_id and preserve traits in metadata.",
-    "notifications": "Notification blueprint. Store channel/template references in structured columns and metadata JSON.",
-    "notification_templates": "Notification template library. Port subject/body into template fields and keep variants in metadata JSON.",
-    "notification_targets": "Recipient configuration. Map target polymorphism through target_type/target_id with channel flags in metadata.",
+    "audit_events": "Audit timeline. Map actor/scope identifiers and persist field-level deltas via audit_event_changes.",
+    "system_jobs": "Asynchronous job queue. Persist handler arguments in dedicated columns and optional related-record pointers.",
+    "system_settings": "Configuration registry. Typed columns replace generic value blobs for clearer governance.",
+    "integration_settings": "Integration configuration. Dedicated columns store endpoint and credential references.",
+    "entities": "Canonical party/person/company row. Preserve profile attributes or extend via attribute_assignments.",
+    "entity_credentials": "Authentication credentials. Align identifiers with entity_id and credential fields; extend via attribute_assignments when necessary.",
+    "workflow_events": "Workflow audit trail. Map timestamps and actor references into normalized event fields.",
+    "workflow_definitions": "Workflow definition catalog. Persist structural details through workflow_steps and related tables.",
+    "workflow_steps": "Ordered workflow stages. Use step order, automation flags, and dedicated attributes for specialized behavior.",
+    "deal_terms": "Deal economics. Normalize numeric thresholds and timing values into standardized columns or deal_settings.",
+    "document_links": "Document attachment join. Map owning model via documentable_type/documentable_id.",
+    "notifications": "Notification blueprint. Context references live in structured columns or notification_targets rows.",
+    "notification_templates": "Notification template library. Port subject/body into template fields; use attribute_assignments for variants.",
+    "notification_targets": "Recipient configuration. Map target polymorphism through target_type/target_id with explicit delivery result columns.",
 }
 
 
@@ -136,13 +136,8 @@ def resolve_column_mapping(legacy_table, column):
             repl = replacements.get(column)
             if repl and repl in target_cols:
                 return f"{target}.{repl}", "Temporal column normalized during refactor."
-    # metadata fallback
-    for target in targets:
-        target_cols = refactored_tables.get(target, [])
-        if "metadata" in target_cols:
-            return f"{target}.metadata", f"Preserve `{column}` inside metadata JSON payload."
     if targets:
-        hint = notes_hint.get(targets[0], "Requires case-by-case migration scripting.")
+        hint = notes_hint.get(targets[0], "Use attribute_assignments or related detail tables introduced in the refactored schema.")
         return targets[0], hint
     return "(no target)", "Table not present in mapping narrative; review manually."
 

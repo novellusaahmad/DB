@@ -128,10 +128,10 @@ print_section "Contact & Location Management" "\
   entity_contacts -> contact_points (renamed)
   contact_points -> contact_points (unchanged)"
 
-print_section "Attribute & Metadata Framework" "\
+print_section "Attribute Extension Framework" "\
   attribute_entities -> attribute_assignments
   attribute_types -> attribute_definitions
-  attribute_groups -> attribute_definitions (grouping metadata)
+  attribute_groups -> attribute_definitions (grouping descriptors)
   attributes -> attribute_definitions
   attribute_values -> attribute_assignments
   asset_insurance_notes -> attribute_assignments
