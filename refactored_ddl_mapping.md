@@ -43,6 +43,21 @@ The table below illustrates how to read the mapping by walking through frequentl
 | `deal_notes` | `notes`, `note_links` | Note bodies migrate into `notes.note_body` while author references map to `author_entity_id`. A companion `note_links` row records the `notable_type='deals'` and `notable_id` so the same note can still attach to multiple records, mirroring the legacy polymorphism via morph columns.【F:refactored_ddl.sh†L95-L120】【F:refactored_ddl.sql†L387-L407】 |
 | `bank_details` | `financial_accounts` | Banking rows move into `financial_accounts` with `accountable_type='entities'` (or another owning model), `account_reference` storing the legacy account number, and optional routing numbers captured in dedicated fields. Date ranges and bespoke attributes transfer into `valid_from`, `valid_to`, and `metadata` to avoid data loss.【F:refactored_ddl.sh†L95-L120】【F:refactored_ddl.sql†L138-L157】 |
 
+## Column-level mapping reference
+
+The matrix below extends the narrative with concrete column pairings so data engineers can script migrations without reverse engineering the schema. Each row surfaces a commonly migrated attribute, its landing zone, and the conventions used when shape or semantics shift during the refactor.
+
+| Legacy table | Legacy column | Refactored table | Refactored column(s) | Notes |
+| --- | --- | --- | --- | --- |
+| `asset_addresses` | `postcode`, `county`, `city`, `district`, `street`, `house_number` | `postal_addresses` | `postcode`, `county`, `city`, `district`, `street`, `house_number` | Core location fields lift-and-shift into the consolidated address catalog; `country` is normalized into `postal_addresses.country_code` using ISO values during migration.【F:ddl.sql†L44-L55】【F:refactored_ddl.sql†L100-L118】 |
+| `asset_addresses` | `id` | `address_links` | `address_id` | When assets reference their address record, the foreign key transitions into the polymorphic join so the same `postal_addresses` row can attach to multiple owners via `addressable_type`/`addressable_id`.【F:ddl.sql†L44-L55】【F:refactored_ddl.sql†L120-L133】 |
+| `bank_details` | `account_number`, `sort_code`, `bic`, `iban` | `financial_accounts` | `account_reference`, `sort_code`, `bic`, `iban` | Account metadata keeps its own columns; `account_reference` stores the historic account number while `metadata` captures any soft-deleted flags that previously relied on `deleted_at`.【F:ddl.sql†L115-L124】【F:refactored_ddl.sql†L137-L153】 |
+| `broker_agent_deals` | `broker_agent_id` | `relationship_links` | `left_id` (`left_type='entities'`) | Broker agents now materialize as `entities`, so the join’s agent foreign key lands in the polymorphic `left_id` slot to support reuse with other entity roles.【F:ddl.sql†L1444-L1455】【F:refactored_ddl.sql†L201-L209】 |
+| `broker_agent_deals` | `deal_id`, `created_at`, `updated_at` | `relationship_links` | `right_id`, `started_at`, `ended_at` | Deal associations remain on the right-hand side while lifecycle timestamps align with the temporal columns that drive relationship histories in the refactored model.【F:ddl.sql†L1444-L1455】【F:refactored_ddl.sql†L205-L217】 |
+| `broker_agent_notes` | `note_id`, `broker_agent_id` | `note_links` | `note_id`, `notable_id` (`notable_type='entities'`) | Notes still point to their text record; the association now uses morph columns so the same note can fan out to multiple entities without bespoke bridge tables.【F:ddl.sql†L1462-L1475】【F:refactored_ddl.sql†L396-L404】 |
+| `deal_notes` | `note`, `created_by_user_id`, `deal_id` | `notes`, `note_links` | `note_body`, `author_entity_id`, `notable_id` (`notable_type='deals'`) | Deal commentary is preserved by moving the text and author to `notes` while the deal relationship continues through `note_links`, enabling cross-record reuse.【F:ddl.sql†L1902-L1915】【F:refactored_ddl.sql†L387-L404】 |
+
+
 ## Table reduction rationale
 
 The mapping demonstrates how consolidating redundant join and lookup tables into polymorphic structures reduced the schema footprint from 149 to 50 base tables. Common examples include:
