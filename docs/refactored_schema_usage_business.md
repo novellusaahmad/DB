@@ -21,3 +21,13 @@
 - **Faster product launches:** New offerings reuse existing tables and lookups, accelerating go-to-market and reducing regression risk.【F:refactored_ddl.sql†L33-L598】
 - **Improved reporting:** Consolidated transaction, workflow, and document data ensures management reporting draws from a single, reliable set of tables, reducing manual reconciliations.【F:refactored_ddl.sql†L347-L659】
 - **Lower maintenance costs:** Fewer tables mean fewer bespoke migrations, simpler change control, and a clearer audit story for regulators and partners.【F:refactored_ddl.sh†L228-L231】【F:refactored_ddl.sql†L788-L863】
+
+## Where every legacy table lands
+Business and data teams asked for a simple way to confirm that nothing has been left behind. The appendix now links every one of the 149 legacy tables to the refactored structure that serves it, grouped by functional area (identity, reference data, deals, transactions, documents, workflows, and more). Use it to brief stakeholders on where familiar datasets will surface in the new operating model and which refactored capability (entity hub, workflow suite, shared documents, unified ledger, etc.) they should query for future reporting.【F:docs/refactored_table_convergence.md†L1-L230】【F:docs/refactored_table_convergence.md†L230-L366】【F:docs/refactored_table_convergence.md†L366-L407】
+
+### How to read the appendix
+1. **Scan by domain.** Each section (e.g., “Identity & Access Management”, “Deal Lifecycle & Workflow”) lists the legacy source tables you know today and points to the refactored table(s) that deliver the same information going forward.【F:docs/refactored_table_convergence.md†L12-L171】【F:docs/refactored_table_convergence.md†L172-L318】
+2. **Understand the capability.** The “Convergence detail” column explains which shared platform service now owns that data—helpful when planning cutover comms or training for teams such as sales ops, credit, or compliance.【F:docs/refactored_table_convergence.md†L12-L171】【F:docs/refactored_table_convergence.md†L230-L318】
+3. **Share tailored extracts.** Filter the table to produce audience-specific cheat sheets (e.g., all finance and payment tables for Treasury) without rewriting the mapping.
+
+> 📎 **Appendix A – Legacy-to-Refactored Table Matrix**: See `docs/refactored_table_convergence.md` for the full, always up-to-date matrix covering all 149 source tables and their new homes.【F:docs/refactored_table_convergence.md†L1-L407】

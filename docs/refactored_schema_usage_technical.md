@@ -52,3 +52,13 @@ System automation is centralised via `system_jobs` for asynchronous work, while 
 - Use reference domains to introduce new enumerations instead of creating new lookup tables, keeping the refactored model lean.【F:refactored_ddl.sql†L33-L53】
 - Prefer polymorphic link tables (`relationship_links`, `address_links`, `document_links`, `note_links`, `notification_targets`) when connecting records; avoid new bespoke joins unless polymorphism cannot express the requirement.【F:refactored_ddl.sql†L229-L447】
 - Store bespoke metadata through `attribute_definitions`/`attribute_assignments` to remain forward compatible with future schema reductions.【F:refactored_ddl.sql†L180-L211】
+
+## Legacy table coverage index
+To complement the column-level mapping, the **Legacy-to-Refactored Table Convergence** matrix captures every source table from `ddl.sql` with its target structures, ordered by functional domain. Reference it during migration planning, ETL development, and stakeholder sign-off to evidence that all 149 inputs have an explicit landing zone in the new schema.【F:docs/refactored_table_convergence.md†L1-L230】【F:docs/refactored_table_convergence.md†L230-L366】【F:docs/refactored_table_convergence.md†L366-L407】
+
+### Using the matrix
+- **Filter by domain** to generate work packages (e.g., finance engineers focus on “Financial Terms & Transactions” plus “Pricing & Rate Management”).【F:docs/refactored_table_convergence.md†L172-L318】【F:docs/refactored_table_convergence.md†L318-L366】
+- **Map dependencies** by cross-referencing polymorphic targets (entities, deals, workflows) so load order respects foreign-key constraints outlined earlier in this guide.【F:docs/refactored_table_convergence.md†L12-L171】【F:docs/refactored_table_convergence.md†L230-L318】
+- **Share with business partners** by embedding the “Convergence detail” narrative directly into runbooks; it explains how users will access equivalent data in the refactored platform.【F:docs/refactored_table_convergence.md†L12-L171】【F:docs/refactored_table_convergence.md†L230-L318】
+
+> 📎 **Appendix A – Legacy-to-Refactored Table Matrix**: `docs/refactored_table_convergence.md` is the canonical list and should be version-controlled alongside migrations so changes remain auditably linked to releases.【F:docs/refactored_table_convergence.md†L1-L407】
