@@ -204,9 +204,11 @@ CREATE TABLE attribute_assignments (
   valid_from        timestamp without time zone,
   valid_to          timestamp without time zone,
   created_at        timestamp without time zone DEFAULT now(),
-  updated_at        timestamp without time zone DEFAULT now(),
-  UNIQUE(definition_id, owner_type, owner_id, COALESCE(valid_from, '1970-01-01'))
+  updated_at        timestamp without time zone DEFAULT now()
 );
+
+DROP INDEX IF EXISTS attribute_assignments_unique_idx;
+CREATE UNIQUE INDEX attribute_assignments_unique_idx ON attribute_assignments (definition_id, owner_type, owner_id, COALESCE(valid_from, '1970-01-01'));
 
 DROP TABLE IF EXISTS assets CASCADE;
 
@@ -242,9 +244,11 @@ CREATE TABLE relationship_links (
   start_date              date,
   end_date                date,
   started_at              timestamp without time zone,
-  ended_at                timestamp without time zone,
-  UNIQUE(left_type, left_id, right_type, right_id, relationship_type_id, COALESCE(context_type, ''), COALESCE(context_id, 0))
+  ended_at                timestamp without time zone
 );
+
+DROP INDEX IF EXISTS relationship_links_unique_idx;
+CREATE UNIQUE INDEX relationship_links_unique_idx ON relationship_links (left_type, left_id, right_type, right_id, relationship_type_id, COALESCE(context_type, ''), COALESCE(context_id, 0));
 
 DROP INDEX IF EXISTS relationship_links_left_idx;
 CREATE INDEX relationship_links_left_idx ON relationship_links (left_type, left_id);
@@ -432,12 +436,14 @@ CREATE TABLE document_links (
   linkable_id        bigint NOT NULL,
   link_role_id       bigint,
   is_primary         boolean DEFAULT false,
-  created_at         timestamp without time zone DEFAULT now(),
-  UNIQUE(document_id, linkable_type, linkable_id, COALESCE(link_role_id, 0))
+  created_at         timestamp without time zone DEFAULT now()
 );
 
 DROP INDEX IF EXISTS document_links_linkable_idx;
 CREATE INDEX document_links_linkable_idx ON document_links (linkable_type, linkable_id);
+
+DROP INDEX IF EXISTS document_links_unique_idx;
+CREATE UNIQUE INDEX document_links_unique_idx ON document_links (document_id, linkable_type, linkable_id, COALESCE(link_role_id, 0));
 
 DROP TABLE IF EXISTS notes CASCADE;
 
@@ -850,9 +856,11 @@ CREATE TABLE system_settings (
   value_boolean           boolean,
   value_date              date,
   created_at              timestamp without time zone DEFAULT now(),
-  updated_at              timestamp without time zone DEFAULT now(),
-  UNIQUE(setting_key, COALESCE(scope_type, ''), COALESCE(scope_id, 0))
+  updated_at              timestamp without time zone DEFAULT now()
 );
+
+DROP INDEX IF EXISTS system_settings_unique_idx;
+CREATE UNIQUE INDEX system_settings_unique_idx ON system_settings (setting_key, COALESCE(scope_type, ''), COALESCE(scope_id, 0));
 
 
 -- Apply foreign key constraints
